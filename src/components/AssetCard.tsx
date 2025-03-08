@@ -9,12 +9,10 @@ interface AssetCardProps {
     id: number;
     symbol: string;
     quantity: number;
-    previousPrice: number;
   };
-  previousPrice: number;
 }
 
-const AssetCard: React.FC<AssetCardProps> = ({ asset, previousPrice }) => {
+const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   const navigate = useNavigate();
   const { removeAsset } = usePortfolioStore();
   const currentPrice = usePriceStream(asset.symbol);
@@ -25,14 +23,14 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, previousPrice }) => {
   };
 
   const handleDelete = () => {
-  removeAsset(asset.id);
+    removeAsset(asset.id);
   };
 
   return (
     <div className="border p-4 bg-white rounded-lg shadow-md">
       <div className="flex justify-between items-center">
         <h3 className="font-bold text-lg">{asset.symbol}</h3>
-        <PriceBadge currentPrice={currentPrice} previousPrice={previousPrice} />
+        <PriceBadge currentPrice={currentPrice} />
         <div className="flex space-x-2">
           <button
             className="text-blue-500 hover:underline"
@@ -53,7 +51,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset, previousPrice }) => {
       <Link to={`/details/${asset.id}`} className="block mt-2">
         <p className="text-gray-600">Quantity: {asset.quantity}</p>
         <p className="text-gray-600">Current Price: ${currentPrice?.toLocaleString() || 'N/A'}</p>
-        <p className="font-semibold">Total: ${(currentPrice ? currentPrice * asset.quantity : previousPrice * asset.quantity).toLocaleString()}</p>
+        <p className="font-semibold">Total: ${(currentPrice ? currentPrice * asset.quantity : 0).toLocaleString()}</p>
       </Link>
     </div>
   );

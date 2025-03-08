@@ -20,7 +20,6 @@ export default function Home() {
           <AssetCard
             key={asset.id}
             asset={asset}
-            previousPrice={asset.previousPrice}
           />
         ))}
       </main>
