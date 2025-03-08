@@ -2,7 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import usePortfolioStore from '../hooks/usePortfolioStore';
 import AssetCard from '../components/AssetCard';
-import usePriceStream from '../hooks/usePriceStream';
 
 export default function Home() {
   const { assets } = usePortfolioStore();
@@ -21,7 +20,6 @@ export default function Home() {
           <AssetCard
             key={asset.id}
             asset={asset}
-            currentPrice={usePriceStream(asset.symbol)}
             previousPrice={asset.previousPrice}
           />
         ))}
