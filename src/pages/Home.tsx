@@ -37,7 +37,7 @@ export default function Home() {
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
         <Link to="/add">
-          <Button>+ Add New Holding</Button>
+          <Button>+ Crypto</Button>
         </Link>
       </header>
 

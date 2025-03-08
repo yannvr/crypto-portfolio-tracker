@@ -19,7 +19,7 @@ export default function PriceChart({ symbol }: PriceChartProps) {
         const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}USDT&interval=1d&limit=7`);
         const result = await response.json();
         const formattedData = result.map((item: any) => ({
-          date: new Date(item[0]).toLocaleDateString(),
+          date: new Date(item[0]).toLocaleDateString('en-GB', { month: '2-digit', day: 'numeric' }), // Shortened date format
           price: parseFloat(item[4]), // Closing price
         }));
         setData(formattedData);
