@@ -16,7 +16,6 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   const navigate = useNavigate();
   const { removeAsset } = usePortfolioStore();
   const currentPrice = usePriceStream(asset.symbol);
-  console.log("🚀 ~ currentPrice:", currentPrice)
 
   const handleEdit = () => {
     navigate(`/edit/${asset.id}`);
@@ -27,9 +26,9 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   };
 
   return (
-    <div className="border p-4 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-center">
-        <h3 className="font-bold text-lg">{asset.symbol}</h3>
+    <div className="border p-4 bg-card rounded-lg shadow-md">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-bold text-lg text-primary">{asset.symbol}</h3>
         <PriceBadge currentPrice={currentPrice} />
         <div className="flex space-x-2">
           <button

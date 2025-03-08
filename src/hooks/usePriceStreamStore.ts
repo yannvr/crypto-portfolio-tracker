@@ -23,7 +23,6 @@ const usePriceStreamStore = create<PriceStreamState>()(
 );
 
 export function usePriceStream(assetSymbol: string, onError?: (message: string) => void) {
-  console.log("🚀 ~ usePriceStream ~ assetSymbol:", assetSymbol)
   const { prices, setPrice } = usePriceStreamStore();
 
   useEffect(() => {
@@ -31,7 +30,6 @@ export function usePriceStream(assetSymbol: string, onError?: (message: string) 
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("🚀 ~ useEffect ~ data:", data)
       setPrice(assetSymbol, parseFloat(data.c));
     };
 
