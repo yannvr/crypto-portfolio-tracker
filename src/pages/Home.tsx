@@ -58,9 +58,15 @@ export default function Home() {
       </div>
 
       <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredAndSortedAssets.map((asset) => (
-          <AssetCard key={asset.id} asset={asset} />
-        ))}
+        {filteredAndSortedAssets.length > 0 ? (
+          filteredAndSortedAssets.map((asset) => (
+            <AssetCard key={asset.id} asset={asset} />
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-400">
+            Add an asset to view your portfolio
+          </div>
+        )}
       </main>
     </div>
   );
