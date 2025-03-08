@@ -32,12 +32,15 @@ export default function PriceChart({ symbol }: PriceChartProps) {
   }, [symbol]);
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <XAxis dataKey="date" />
-        <YAxis tickFormatter={(value) => `$${value.toFixed(2)}`} />
-        <Tooltip formatter={(value: number) => `$${value.toFixed(2)}`} />
-        <Line type="monotone" dataKey="price" stroke="#8884d8" />
+    <ResponsiveContainer width="100%" height={250}>
+      <LineChart data={data} className="bg-black">
+        <XAxis dataKey="date" tick={{ fill: '#bbb' }} />
+        <YAxis tick={{ fill: '#bbb' }} tickFormatter={(value) => `$${value.toFixed(2)}`} />
+        <Tooltip
+          contentStyle={{ backgroundColor: 'black', border: 'none', color: 'white' }}
+          formatter={(value: number) => `$${value.toFixed(2)}`}
+        />
+        <Line type="monotone" dataKey="price" stroke="#66ff66" strokeWidth={2} dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );

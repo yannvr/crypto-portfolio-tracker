@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import usePortfolioStore from '../hooks/usePortfolioStore';
 import usePriceStreamStore from '../hooks/usePriceStreamStore';
 import AssetCard from '../components/AssetCard';
+import TextInput from '../components/ui/TextInput';
+import Button from '../components/ui/Button';
+import Select from '../components/ui/Select';
 
 type SortOption = 'name' | 'value';
 
@@ -30,39 +33,33 @@ export default function Home() {
   }, [assets, prices, sortOption, searchTerm]);
 
   return (
-    <div className="max-w-5xl mx-auto p-6 bg-background rounded-lg shadow-lg">
-      <header className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-primary">Crypto Portfolio</h1>
-        <Link to="/add" className="bg-blue-500  bg-accent text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-400">
-          + Add New Holding
+    <div className="min-h-screen bg-black text-white px-6 py-8">
+      <header className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
+        <Link to="/add">
+          <Button>+ Add New Holding</Button>
         </Link>
       </header>
 
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search asset..."
+        <TextInput
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border rounded-lg p-3 flex-1 shadow-sm"
+          placeholder="Search asset..."
         />
 
-        <select
+        <Select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value as SortOption)}
-          className="border rounded-lg p-3 shadow-sm"
         >
           <option value="name">Sort by Name</option>
           <option value="value">Sort by Value</option>
-        </select>
+        </Select>
       </div>
 
       <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredAndSortedAssets.map((asset) => (
-          <AssetCard
-            key={asset.id}
-            asset={asset}
-          />
+          <AssetCard key={asset.id} asset={asset} />
         ))}
       </main>
     </div>
