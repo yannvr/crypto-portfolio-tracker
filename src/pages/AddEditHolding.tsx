@@ -9,7 +9,7 @@ import ErrorMessage from '../components/ui/ErrorMessage';
 export default function AddEditHolding() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { assets, addAsset, editAsset } = usePortfolioStore();
+  const { assets, addAsset, editAsset, removeAsset } = usePortfolioStore();
   const editingAsset = assets.find((asset) => asset.id === Number(id));
   const [form, setForm] = useState({ symbol: '', quantity: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -45,6 +45,16 @@ export default function AddEditHolding() {
     navigate('/');
   }, [form, editingAsset, addAsset, editAsset, navigate]);
 
+  const handleDeleteAsset = useCallback(() => {
+    if (editingAsset) {
+      const confirmed = window.confirm(`Are you sure you want to delete ${editingAsset.symbol}?`);
+      if (confirmed) {
+        removeAsset(editingAsset.id);
+        navigate('/');
+      }
+    }
+  }, [editingAsset, removeAsset, navigate]);
+
   return (
     <div className="min-h-screen bg-black text-white flex justify-center items-center">
       <div className="w-full max-w-md bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg backdrop-blur-md">
@@ -68,10 +78,17 @@ export default function AddEditHolding() {
           <Button onClick={() => navigate('/')} secondary>
             Cancel
           </Button>
+          {editingAsset && (
+          <Button onClick={handleDeleteAsset} className="bg-red-500 hover:bg-red-400">
+            Delete
+          </Button>
+        )}
           <Button onClick={handleAddOrEditAsset}>
             {editingAsset ? 'Save' : 'Add'}
           </Button>
         </div>
+
+
       </div>
     </div>
   );
