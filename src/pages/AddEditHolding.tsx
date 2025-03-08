@@ -1,18 +1,18 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import usePortfolioStore from '../hooks/usePortfolioStore';
-import TextInput from '../components/ui/TextInput';
-import NumberInput from '../components/ui/NumberInput';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import ErrorMessage from '../components/ui/ErrorMessage';
+import NumberInput from '../components/ui/NumberInput';
+import TextInput from '../components/ui/TextInput';
+import usePortfolioStore from '../hooks/usePortfolioStore';
 
 export default function AddEditHolding() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { assets, addAsset, editAsset, removeAsset } = usePortfolioStore();
-  const editingAsset = assets.find((asset) => asset.id === Number(id));
+  const { addAsset, editAsset, removeAsset, selectAsset} = usePortfolioStore();
   const [form, setForm] = useState({ symbol: '', quantity: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const editingAsset = selectAsset(id);
 
   useEffect(() => {
     if (editingAsset) {
@@ -58,37 +58,35 @@ export default function AddEditHolding() {
   return (
     <div className="min-h-screen bg-black text-white flex justify-center items-center">
       <div className="w-full max-w-md bg-gray-900/80 border border-gray-800 rounded-xl p-6 shadow-lg backdrop-blur-md">
-        <h2 className="text-xl font-bold text-white mb-4">{editingAsset ? 'Edit Asset' : 'Add New Asset'}</h2>
+        <h2 className="text-xl font-bold text-white mb-4">{editingAsset ? 'Edit Asset' : 'Add New Crypto Asset'}</h2>
 
         <TextInput
           value={form.symbol}
-          onChange={(e) => setForm({ ...form, symbol: e.target.value })}
+          onChange={e => setForm({ ...form, symbol: e.target.value })}
           placeholder="Token Symbol (BTC)"
         />
         {errors.symbol && <ErrorMessage message={errors.symbol} />}
 
         <NumberInput
           value={form.quantity}
-          onChange={(e) => setForm({ ...form, quantity: e.target.value })}
+          onChange={e => setForm({ ...form, quantity: e.target.value })}
           placeholder="Quantity"
         />
         {errors.quantity && <ErrorMessage message={errors.quantity} />}
 
         <div className="flex justify-between items-center mt-4">
-          <Button onClick={() => navigate('/')} secondary>
-            Cancel
-          </Button>
-          {editingAsset && (
-          <Button onClick={handleDeleteAsset} className="bg-red-500 hover:bg-red-400">
-            Delete
-          </Button>
-        )}
-          <Button onClick={handleAddOrEditAsset}>
-            {editingAsset ? 'Save' : 'Add'}
-          </Button>
+          <div className="flex gap-4">
+            <Button onClick={() => navigate('/')} secondary>
+              Cancel
+            </Button>
+            {editingAsset && (
+              <Button onClick={handleDeleteAsset} className="bg-red-500 hover:bg-red-400">
+                Delete
+              </Button>
+            )}
+          </div>
+          <Button onClick={handleAddOrEditAsset}>{editingAsset ? 'Save' : 'Add'}</Button>
         </div>
-
-
       </div>
     </div>
   );

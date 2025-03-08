@@ -12,14 +12,13 @@ interface PortfolioState {
   addAsset: (asset: Asset) => void;
   removeAsset: (id: number) => void;
   editAsset: (updatedAsset: Asset) => void;
+  selectAsset: (id?: string) => Asset | undefined;
 }
 
 const usePortfolioStore = create<PortfolioState>()(
   persist<PortfolioState>(
-    (set) => ({
+    (set, get) => ({
       assets: [
-        { id: 6, symbol: 'DOT', quantity: 100 },
-        { id: 7, symbol: 'BNB', quantity: 20 },
       ],
       addAsset: asset => set(state => ({ assets: [...state.assets, asset] })),
       removeAsset: id =>
@@ -30,10 +29,10 @@ const usePortfolioStore = create<PortfolioState>()(
         set(state => ({
           assets: state.assets.map(asset => (asset.id === updatedAsset.id ? updatedAsset : asset)),
         })),
+        selectAsset: id => id ? get().assets.find(asset => asset.id === Number(id)) : undefined,
     }),
     {
       name: 'portfolio-storage', // name of the item in the storage (must be unique)
-      getStorage: () => localStorage, // (optional) by default, 'localStorage' is used
     },
   ),
 );

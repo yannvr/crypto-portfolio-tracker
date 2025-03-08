@@ -1,12 +1,11 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
-import usePortfolioStore from '../hooks/usePortfolioStore';
 import AssetDetails from '../components/AssetDetails';
+import usePortfolioStore from '../hooks/usePortfolioStore';
 
 export default function Details() {
   const { id } = useParams();
-  const { assets } = usePortfolioStore();
-  const asset = assets.find((asset) => asset.id === Number(id));
+  const { selectAsset } = usePortfolioStore();
+  const asset = selectAsset(id);
 
   if (!asset) {
     return <div className="text-white text-center mt-10">Asset not found</div>;
