@@ -22,7 +22,7 @@ export default function AddEditHolding() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addAsset, editAsset, removeAsset, selectAsset, assets } = usePortfolioStore();
-  const { coins, loading, findCoinIdBySymbol } = useCoinList();
+  const { loading, findCoinIdBySymbol } = useCoinList();
 
   const [form, setForm] = useState<FormState>({ symbol: '', quantity: '' });
   const [errors, setErrors] = useState<FormErrors>({});

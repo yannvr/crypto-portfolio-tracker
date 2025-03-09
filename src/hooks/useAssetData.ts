@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 import { create } from 'zustand';
 import { API_URLS, ENDPOINTS, fetcher } from '../services/apiService';

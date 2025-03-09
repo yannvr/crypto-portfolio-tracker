@@ -14,7 +14,6 @@ import {
 
 export default function Details() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const selectAsset = usePortfolioStore(state => state.selectAsset);
   const [selectedDays, setSelectedDays] = useState(7);
 
@@ -26,13 +25,14 @@ export default function Details() {
   // Use useMemo to prevent unnecessary re-renders when the asset doesn't change
   const asset = useMemo(() => selectAsset(id), [id, selectAsset]);
 
-  // Fetch coin data
-  const { data: coinData, loading: coinLoading, error: coinError } =
-    asset ? useCoinData(asset.symbol) : { data: null, loading: false, error: null };
+  // Always call hooks unconditionally, but with conditional parameters
+  const symbol = asset?.symbol || '';
 
-  // Fetch price chart data
-  const { chartData, loading: chartLoading, error: chartError } =
-    asset ? usePriceChart(asset.symbol, selectedDays) : { chartData: [], loading: false, error: null };
+  // Fetch coin data - always call the hook, but with empty symbol if no asset
+  const { data: coinData, loading: coinLoading, error: coinError } = useCoinData(symbol);
+
+  // Fetch price chart data - always call the hook, but with empty symbol if no asset
+  const { chartData, loading: chartLoading, error: chartError } = usePriceChart(symbol, selectedDays);
 
   // Calculate y-axis domain for the chart
   const yAxisDomain = useMemo(() => {

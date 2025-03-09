@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AddEditHolding from './AddEditHolding';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { useCoinList } from '../hooks/useAssetData';
 
 // Mock the store
 jest.mock('../store/usePortfolioStore', () => ({
@@ -241,8 +240,7 @@ describe('AddEditHolding Page', () => {
     fireEvent.change(screen.getByDisplayValue('1.5'), { target: { value: '2.5' } });
 
     // Submit the form
-    const form = screen.getByText('Save').closest('form')!;
-    fireEvent.submit(form);
+    fireEvent.click(screen.getByText('Save'));
 
     // editAsset should be called with the correct values
     expect(editAsset).toHaveBeenCalledWith(1, { symbol: 'BTC', quantity: 2.5 });
