@@ -2,9 +2,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AssetCard from '../../components/AssetCard';
 
-const asset = { id: 1, symbol: 'BTC', quantity: 2 };
+// Mock the hooks used inside AssetCard
+jest.mock('../../hooks/usePriceStreamStore', () => ({
+  usePriceStream: jest.fn(() => 500), // Mock price stream to return a fixed price
+}));
 
-jest.mock('../../components/PriceBadge', () => () => <div>PriceBadge</div>);
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate, // Mock useNavigate with a jest function
+}));
+
+const asset = { id: 1, symbol: 'BTC', quantity: 2 };
 
 test('renders AssetCard component correctly', () => {
   render(
@@ -12,8 +21,10 @@ test('renders AssetCard component correctly', () => {
       <AssetCard asset={asset} />
     </Router>
   );
+
   expect(screen.getByText(/BTC/i)).toBeInTheDocument();
   expect(screen.getByText(/Quantity: 2/i)).toBeInTheDocument();
+  expect(screen.getByText(/\$1,000/)).toBeInTheDocument(); // 500 * 2 (mocked price)
 });
 
 test('handles edit button click', () => {
@@ -22,22 +33,10 @@ test('handles edit button click', () => {
       <AssetCard asset={asset} />
     </Router>
   );
-  console.log("🚀 ~ test ~ container:", container)
-  const editButton = container.querySelector('button[aria-label="Edit "]');
-  console.log("🚀 ~ test ~ editButton:", editButton)
-  if(editButton) {
-  fireEvent.click(editButton);
-  }
-  expect(window.location.pathname).toBe('/edit/1');
-});
 
-// test('handles delete button click', () => {
-//   const { container } = render(
-//     <Router>
-//       <AssetCard asset={asset} />
-//     </Router>
-//   );
-//   const deleteButton = container.querySelector('button[aria-label="Delete BTC"]');
-//   fireEvent.click(deleteButton);
-//   expect(window.location.pathname).toBe('/');
-// });
+  const editButton = container.querySelector('button[aria-label="Edit BTC"]');
+  if (editButton) {
+    fireEvent.click(editButton);
+  }
+  expect(mockNavigate).toHaveBeenCalledWith('/edit/1'); // Verify navigation
+});
