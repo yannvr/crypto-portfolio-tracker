@@ -15,28 +15,35 @@ jest.mock('react-router-dom', () => ({
 
 const asset = { id: 1, symbol: 'BTC', quantity: 2 };
 
-test('renders AssetCard component correctly', () => {
-  render(
-    <Router>
-      <AssetCard asset={asset} />
-    </Router>
-  );
+describe('AssetCard Component', () => {
+  it('renders correctly with given asset data', () => {
+    render(
+      <Router>
+        <AssetCard asset={asset} />
+      </Router>
+    );
 
-  expect(screen.getByText(/BTC/i)).toBeInTheDocument();
-  expect(screen.getByText(/Quantity: 2/i)).toBeInTheDocument();
-  expect(screen.getByText(/\$1,000/)).toBeInTheDocument(); // 500 * 2 (mocked price)
-});
+    expect(screen.getByText(/BTC/i)).toBeInTheDocument();
+    expect(screen.getByText(/Quantity: 2/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$1,000/)).toBeInTheDocument(); // 500 * 2 (mocked price)
+    expect(screen.getByText(/Current Price: \$500/)).toBeInTheDocument(); // 500 * 2 (mocked price)
+  });
 
-test('handles edit button click', () => {
-  const { container } = render(
-    <Router>
-      <AssetCard asset={asset} />
-    </Router>
-  );
+  it('navigates correctly when edit button is clicked', () => {
+    const { container } = render(
+      <Router>
+        <AssetCard asset={asset} />
+      </Router>
+    );
 
-  const editButton = container.querySelector('button[aria-label="Edit BTC"]');
-  if (editButton) {
-    fireEvent.click(editButton);
-  }
-  expect(mockNavigate).toHaveBeenCalledWith('/edit/1'); // Verify navigation
+    const editButton = container.querySelector('button[aria-label="Edit BTC"]');
+    if (editButton) {
+      fireEvent.click(editButton);
+    }
+
+    expect(mockNavigate).toHaveBeenCalledWith('/edit/1'); // Verify navigation
+  });
+
+
+
 });
