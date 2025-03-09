@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import ErrorMessage from '../components/ErrorMessage';
 import NumberInput from '../components/NumberInput';
 import TextInput from '../components/TextInput';
-import { usePortfolioStore } from '../store';
+import usePortfolioStore from '../store/usePortfolioStore';
 
 interface FormState {
   symbol: string;

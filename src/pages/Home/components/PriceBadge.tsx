@@ -1,34 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { formatPercent } from "../../../utils/formatters";
+import React from 'react';
+import { formatCurrency } from '../../../utils/utils';
 
 interface PriceBadgeProps {
-  currentPrice: number | null;
+  price: number;
+  priceChange?: number;
+  showChange?: boolean;
 }
 
-export default function PriceBadge({ currentPrice }: PriceBadgeProps) {
-  const [previousPrice, setPreviousPrice] = useState<number | null>(null);
-  const [priceChangeIndicator, setPriceChangeIndicator] = useState<'▲' | '▼' | null>(null);
-  const [priceChangeValue, setPriceChangeValue] = useState<number | null>(null);
+const PriceBadge: React.FC<PriceBadgeProps> = ({
+  price,
+  priceChange = 0,
+  showChange = true
+}) => {
+  // Determine color based on price change
+  const getColorClass = () => {
+    if (priceChange > 0) return 'text-green-500';
+    if (priceChange < 0) return 'text-red-500';
+    return 'text-gray-400';
+  };
 
-  useEffect(() => {
-    if (currentPrice !== null) {
-      if (previousPrice !== null && currentPrice !== previousPrice) {
-        setPriceChangeIndicator(currentPrice > previousPrice ? '▲' : '▼');
-        setPriceChangeValue((currentPrice - previousPrice) / previousPrice);
-      }
-      setPreviousPrice(currentPrice);
-    }
-  }, [currentPrice, previousPrice]);
-
-  if (currentPrice === null || previousPrice === null || priceChangeValue === null) {
-    return null;
-  }
-
-  const priceChangeColor = priceChangeIndicator === '▲' ? 'text-green-500' : 'text-red-500';
+  // Format the price change with a + or - sign
+  const formattedChange = () => {
+    const sign = priceChange > 0 ? '+' : '';
+    return `${sign}${priceChange.toFixed(2)}%`;
+  };
 
   return (
-    <div className={`font-semibold text-sm flex items-center ${priceChangeColor}`}>
-      {priceChangeIndicator} {formatPercent(priceChangeValue, 2)}
+    <div className="flex flex-col items-end">
+      <span className="font-medium">{formatCurrency(price)}</span>
+      {showChange && priceChange !== undefined && (
+        <span className={`text-xs ${getColorClass()}`}>
+          {formattedChange()}
+        </span>
+      )}
     </div>
   );
-}
+};
+
+export default PriceBadge;

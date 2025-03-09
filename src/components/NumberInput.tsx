@@ -11,6 +11,7 @@ const NumberInput: React.FC<NumberInputProps> = ({ value, onChange, placeholder 
     <input
       className="bg-gray-800 border border-gray-700 text-white rounded-md sm:rounded-full px-4 py-2 w-full mt-2 shadow-sm focus:ring-2 focus:ring-green-500"
       type="number"
+      min={1}
       value={value}
       onChange={onChange}
       placeholder={placeholder}

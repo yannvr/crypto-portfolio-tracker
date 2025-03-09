@@ -1,20 +1,23 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { usePortfolioStore, usePriceStreamStore } from '../store';
+import usePortfolioStore from '../store/usePortfolioStore';
+import { usePriceStore, usePortfolioPriceStreams } from '../hooks/useAssetData';
 import AssetCard from './Home/components/AssetCard';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import Select from '../components/Select';
-import { usePriceStream } from '../store/usePriceStreamStore';
-import { formatCurrency } from '../utils/formatters';
+import { formatCurrency } from '../utils/utils';
 
 type SortOption = 'name' | 'value';
 
 export default function Home() {
   const { assets } = usePortfolioStore();
-  const { prices } = usePriceStreamStore();
+  const { prices } = usePriceStore();
   const [sortOption, setSortOption] = useState<SortOption>('name');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Initialize price streams for all assets
+  usePortfolioPriceStreams(assets);
 
   // Calculate total portfolio value
   const totalPortfolioValue = useMemo(() => {
