@@ -26,7 +26,7 @@ export function usePriceStream(assetSymbol: string, onError?: (message: string) 
   const { prices, setPrice } = usePriceStreamStore();
 
   useEffect(() => {
-    const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${assetSymbol.toLowerCase()}usdt@miniTicker`);
+    const ws = new WebSocket(`wss://stream.binance.com:443/ws/${assetSymbol.toLowerCase()}usdt@miniTicker`);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
