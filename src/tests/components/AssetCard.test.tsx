@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import AssetCard from '../../components/AssetCard';
+import AssetCard from '@components/AssetCard';
 
 // Mock the hooks used inside AssetCard
-jest.mock('../../hooks/usePriceStreamStore', () => ({
+jest.mock('@store/usePriceStreamStore', () => ({
   usePriceStream: jest.fn(() => 500), // Mock price stream to return a fixed price
 }));
 

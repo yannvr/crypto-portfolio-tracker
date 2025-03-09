@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '../components/ui/Button';
 
 export default function PageNotFound() {
   const navigate = useNavigate();

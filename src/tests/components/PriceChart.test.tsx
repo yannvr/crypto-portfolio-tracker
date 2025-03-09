@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
-import PriceChart from '../../components/PriceChart';
+import PriceChart from '@components/PriceChart';
 
 // Properly cast fetch as a Jest mock function
 global.fetch = jest.fn() as jest.Mock;

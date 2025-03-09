@@ -1,12 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import AssetDetails from '../../components/AssetDetails';
+import AssetDetails from '@components/AssetDetails';
 
 // Mock dependencies
-jest.mock('../../components/PriceChart', () => () => <div>PriceChart</div>);
+jest.mock('@components/PriceChart', () => () => <div>PriceChart</div>);
 
 // Mock price stream to return a fixed price or null
-jest.mock('../../hooks/usePriceStreamStore', () => ({
+jest.mock('@store/usePriceStreamStore', () => ({
   usePriceStream: jest.fn((symbol) => {
     if (symbol === 'BTC') return 500; // Mock price stream to return $500 for BTC
     if (symbol === 'ETH') return -500; // Mock price stream to return -$500 for ETH

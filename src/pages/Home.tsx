@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import usePortfolioStore from '../hooks/usePortfolioStore';
-import usePriceStreamStore from '../hooks/usePriceStreamStore';
-import AssetCard from '../components/AssetCard';
-import TextInput from '../components/ui/TextInput';
-import Button from '../components/ui/Button';
-import Select from '../components/ui/Select';
+import usePortfolioStore from '@store/usePortfolioStore';
+import usePriceStreamStore from '@store/usePriceStreamStore';
+import AssetCard from '@components/AssetCard';
+import TextInput from '@components/ui/TextInput';
+import Button from '@components/ui/Button';
+import Select from '@components/ui/Select';
 
 type SortOption = 'name' | 'value';
 
@@ -37,7 +37,7 @@ export default function Home() {
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
         <Link to="/add">
-          <Button>+ Crypto</Button>
+          <Button>+ Asset</Button>
         </Link>
       </header>
 

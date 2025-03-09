@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import PriceChart from './PriceChart';
-import { usePriceStream } from '../hooks/usePriceStreamStore';
-import Button from './ui/Button';
+import { usePriceStream } from '@store/usePriceStreamStore';
+import Button from '@components/ui/Button';
+import PriceChart from '@components/PriceChart';
 
 interface AssetDetailsProps {
   asset: {

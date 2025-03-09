@@ -5,8 +5,8 @@ module.exports = {
   moduleDirectories: ['node_modules', '<rootDir>/src'], // Ensure Jest resolves from src
   moduleNameMapper: {
     '^@components/(.*)$': '<rootDir>/src/components/$1',
-    '^@hooks/(.*)$': '<rootDir>/src/hooks/$1',
-    '^@utils/(.*)$': '<rootDir>/src/utils/$1'
+    // '^@components/ui/(.*)$': '<rootDir>/src/components/ui/$1',
+    '^@store/(.*)$': '<rootDir>/src/store/$1',
   },
   // moduleNameMapper: {
   //   // Handle CSS imports (if your app imports styles)

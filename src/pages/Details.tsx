@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
-import AssetDetails from '../components/AssetDetails';
-import usePortfolioStore from '../hooks/usePortfolioStore';
+import AssetDetails from '@components/AssetDetails';
+import usePortfolioStore from '@store/usePortfolioStore';
 
 export default function Details() {
   const { id } = useParams();

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import usePortfolioStore from '../hooks/usePortfolioStore';
-import { usePriceStream } from '../hooks/usePriceStreamStore';
-import PriceBadge from './PriceBadge';
+import { usePriceStream } from '@store/usePriceStreamStore';
+import PriceBadge from '@components/PriceBadge';
 
 interface AssetCardProps {
   asset: {
@@ -11,20 +10,6 @@ interface AssetCardProps {
     quantity: number;
   };
 }
-
-const EditIcon = <svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="w-5 h-5 text-gray-400 hover:text-gray-300"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  strokeWidth="2"
-  strokeLinecap="round"
-  strokeLinejoin="round"
->
-  <path d="M12 20h9" />
-  <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
-</svg>;
 
 const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   const navigate = useNavigate();
@@ -66,5 +51,21 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
     </Link>
   );
 };
+
+// Custom SVG icon for the edit button to fit the design
+const EditIcon = <svg
+  xmlns="http://www.w3.org/2000/svg"
+  className="w-5 h-5 text-gray-400 hover:text-gray-300"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+>
+  <path d="M12 20h9" />
+  <path d="M16.5 3.5a2.121 2.121 0 113 3L7 19l-4 1 1-4 12.5-12.5z" />
+</svg>;
+
 
 export default AssetCard;
