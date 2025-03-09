@@ -28,18 +28,12 @@ const EditIcon = <svg
 
 const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   const navigate = useNavigate();
-  const { removeAsset } = usePortfolioStore();
   const currentPrice = usePriceStream(asset.symbol);
   const totalValue = currentPrice ? currentPrice * asset.quantity : 0;
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
     navigate(`/edit/${asset.id}`);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.preventDefault();
-    removeAsset(asset.id);
   };
 
   return (
