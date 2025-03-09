@@ -1,10 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePriceStream } from '../../../store/usePriceStreamStore';
 import { formatCurrency } from '../../../utils/formatters';
 import PriceChart from './PriceChart';
 import Button from '../../../components/Button';
-import { useCoinData } from '../../../hooks/useCoinData';
 import NetworkStats from './NetworkStats';
 import AboutCoin from './AboutCoin';
 
@@ -14,14 +12,21 @@ interface AssetDetailsProps {
     symbol: string;
     quantity: number;
   };
+  coinData: {
+    coinStats: any;
+    coinId: string | null;
+    isLoading: boolean;
+    isError: any;
+  } | null;
 }
 
-export default function AssetDetails({ asset }: AssetDetailsProps) {
+export default function AssetDetails({ asset, coinData }: AssetDetailsProps) {
   const navigate = useNavigate();
-  const { coinStats } = useCoinData(asset.symbol);
+  // const coinStats = coinData?.coinStats;
 
-  // Use price stream hook for real-time price data
-  const currentPrice = usePriceStream(asset.symbol);
+  // Get the current price from the transformed data structure
+  const coinStats = coinData?.coinStats;
+  const currentPrice = coinStats?.market_data?.current_price?.usd || null;
 
   const handleBack = () => {
     navigate('/');
@@ -78,15 +83,15 @@ export default function AssetDetails({ asset }: AssetDetailsProps) {
       </div>
 
       <div className="mb-4">
-        <PriceChart symbol={asset.symbol} />
+        <PriceChart symbol={asset.symbol} coinStats={coinStats} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
-          <NetworkStats symbol={asset.symbol} />
+          <NetworkStats symbol={asset.symbol} coinData={coinData} />
         </div>
         <div>
-          <AboutCoin symbol={asset.symbol} />
+          <AboutCoin symbol={asset.symbol} coinData={coinData} />
         </div>
       </div>
     </div>

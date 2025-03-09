@@ -8,6 +8,41 @@ export interface CoinListItem {
   name: string;
 }
 
+// There are some coins that have multiple IDs, we need to map the most common ones to the canonical ID
+// For intance, BTC is first looked up as batcat...
+const CANONICAL_COIN_IDS: Record<string, string> = {
+  'btc': 'bitcoin',
+  'eth': 'ethereum',
+  'usdt': 'tether',
+  'usdc': 'usd-coin',
+  'bnb': 'binancecoin',
+  'xrp': 'ripple',
+  'ada': 'cardano',
+  'doge': 'dogecoin',
+  'sol': 'solana',
+  'dot': 'polkadot',
+  'shib': 'shiba-inu',
+  'matic': 'matic-network',
+  'avax': 'avalanche-2',
+  'link': 'chainlink',
+  'ltc': 'litecoin',
+  'uni': 'uniswap',
+  'atom': 'cosmos',
+  'xlm': 'stellar',
+  'algo': 'algorand',
+  'etc': 'ethereum-classic',
+  'fil': 'filecoin',
+  'vet': 'vechain',
+  'icp': 'internet-computer',
+  'xmr': 'monero',
+  'xtz': 'tezos',
+  'aave': 'aave',
+  'egld': 'elrond-erd-2',
+  'axs': 'axie-infinity',
+  'theta': 'theta-token',
+  'cake': 'pancakeswap-token',
+};
+
 /**
  * Hook to fetch and cache the list of all coins from CoinGecko
  */
@@ -26,7 +61,7 @@ export function useCoinList() {
   );
 
   /**
-   * Find a coin ID by its symbol
+   * Find a coin ID by its symbol using a priority-based approach
    * @param symbol The coin symbol to look up
    * @returns The coin ID or null if not found
    */
@@ -35,22 +70,47 @@ export function useCoinList() {
 
     const normalizedSymbol = symbol.toLowerCase();
 
-    // First try exact match
-    const exactMatch = data.find(coin => coin.symbol.toLowerCase() === normalizedSymbol);
-    if (exactMatch) return exactMatch.id;
+    // 1. Check if we have a canonical ID for this symbol
+    if (CANONICAL_COIN_IDS[normalizedSymbol]) {
+      // Verify that the canonical ID exists in our data
+      const canonicalExists = data.some(coin => coin.id === CANONICAL_COIN_IDS[normalizedSymbol]);
+      if (canonicalExists) {
+        return CANONICAL_COIN_IDS[normalizedSymbol];
+      }
+    }
 
-    // If no exact match, try to find the most popular coin with this symbol
-    // This is a heuristic - in a real app, you might want to use market cap or other metrics
-    // to determine the "main" coin for a symbol
+    // 2. Find all matches for this symbol
     const matches = data.filter(coin => coin.symbol.toLowerCase() === normalizedSymbol);
-    if (matches.length > 0) {
-      // For now, just return the first match
-      // In a real app, you might want to fetch additional data to determine the most popular one
+
+    if (matches.length === 0) {
+      return null;
+    }
+
+    if (matches.length === 1) {
       return matches[0].id;
     }
 
-    // If still no match, return null
-    return null;
+    // 3. If we have multiple matches, use heuristics to find the most likely one
+
+    // a. Prefer coins where the name closely matches the symbol
+    const nameMatchesSymbol = matches.find(coin =>
+      coin.name.toLowerCase() === normalizedSymbol ||
+      coin.name.toLowerCase().replace(/\s+/g, '') === normalizedSymbol ||
+      coin.name.toLowerCase().includes(normalizedSymbol)
+    );
+    if (nameMatchesSymbol) return nameMatchesSymbol.id;
+
+    // b. Prefer coins with shorter IDs (usually the original/main coins)
+    matches.sort((a, b) => a.id.length - b.id.length);
+
+    // c. Prefer coins where the ID starts with the symbol
+    const idStartsWithSymbol = matches.find(coin =>
+      coin.id.toLowerCase().startsWith(normalizedSymbol)
+    );
+    if (idStartsWithSymbol) return idStartsWithSymbol.id;
+
+    // d. If all else fails, return the first match (which will be the one with the shortest ID)
+    return matches[0].id;
   };
 
   return {

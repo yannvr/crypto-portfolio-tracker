@@ -1,13 +1,19 @@
 import React from 'react';
-import { useCoinData } from '../../../hooks/useCoinData';
 import { formatCurrency, formatNumber } from '../../../utils/formatters';
 
 interface NetworkStatsProps {
   symbol: string;
+  coinData?: {
+    coinStats: any;
+    coinId: string | null;
+    isLoading: boolean;
+    isError: any;
+  } | null;
 }
 
-const NetworkStats: React.FC<NetworkStatsProps> = ({ symbol }) => {
-  const { coinStats, isLoading } = useCoinData(symbol);
+const NetworkStats: React.FC<NetworkStatsProps> = ({ symbol, coinData }) => {
+  const coinStats = coinData?.coinStats;
+  const isLoading = coinData?.isLoading || !coinData;
 
   if (isLoading || !coinStats) {
     return (
@@ -25,43 +31,72 @@ const NetworkStats: React.FC<NetworkStatsProps> = ({ symbol }) => {
     );
   }
 
+  // Access market_data from the transformed structure
+  const marketData = coinStats.market_data;
+
+  // Check if we have the necessary data
+  if (!marketData || Object.keys(marketData).length === 0) {
+    return (
+      <div className="bg-black rounded-lg p-4 md:p-6 h-full">
+        <h3 className="text-lg md:text-xl font-bold mb-4">{symbol} Network Statistics</h3>
+        <p className="text-gray-400">Market data not available for this asset.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black rounded-lg p-4 md:p-6 h-full">
       <h3 className="text-lg md:text-xl font-bold mb-4">{symbol} Network Statistics</h3>
 
-      <div className="space-y-4">
-        <StatItem
-          label="Market Cap"
-          value={formatCurrency(coinStats.marketCap)}
-          hasInfoIcon={true}
-        />
+      <div className="space-y-3">
+        {marketData.market_cap?.usd > 0 && (
+          <StatItem
+            label="Market Cap"
+            value={formatCurrency(marketData.market_cap.usd)}
+            hasInfoIcon
+          />
+        )}
 
-        <StatItem
-          label="Fully Diluted Valuation"
-          value={formatCurrency(coinStats.fullyDilutedValuation)}
-          hasInfoIcon={true}
-        />
+        {marketData.fully_diluted_valuation?.usd > 0 && (
+          <StatItem
+            label="Fully Diluted Valuation"
+            value={formatCurrency(marketData.fully_diluted_valuation.usd)}
+            hasInfoIcon
+          />
+        )}
 
-        <StatItem
-          label="24 Hour Trading Vol"
-          value={formatCurrency(coinStats.tradingVolume24h)}
-        />
+        {marketData.total_volume?.usd > 0 && (
+          <StatItem
+            label="24h Trading Volume"
+            value={formatCurrency(marketData.total_volume.usd)}
+          />
+        )}
 
-        <StatItem
-          label="Circulating Supply"
-          value={formatNumber(coinStats.circulatingSupply)}
-          hasInfoIcon={true}
-        />
+        {marketData.circulating_supply > 0 && (
+          <StatItem
+            label="Circulating Supply"
+            value={`${formatNumber(marketData.circulating_supply)} ${symbol.toUpperCase()}`}
+            hasInfoIcon
+          />
+        )}
 
-        <StatItem
-          label="Total Supply"
-          value={formatNumber(coinStats.totalSupply)}
-        />
+        {marketData.total_supply > 0 && (
+          <StatItem
+            label="Total Supply"
+            value={`${formatNumber(marketData.total_supply)} ${symbol.toUpperCase()}`}
+          />
+        )}
 
-        <StatItem
-          label="Max Supply"
-          value={coinStats.maxSupply !== null ? formatNumber(coinStats.maxSupply) : 'Unlimited'}
-        />
+        {marketData.max_supply && (
+          <StatItem
+            label="Max Supply"
+            value={`${formatNumber(marketData.max_supply)} ${symbol.toUpperCase()}`}
+          />
+        )}
+
+        {Object.keys(marketData).length === 0 && (
+          <div className="text-gray-400">No market data available</div>
+        )}
       </div>
     </div>
   );
@@ -75,20 +110,16 @@ interface StatItemProps {
 
 const StatItem: React.FC<StatItemProps> = ({ label, value, hasInfoIcon = false }) => {
   return (
-    <div className="flex justify-between items-center border-b border-gray-800 pb-2">
+    <div className="flex justify-between items-center py-2 border-b border-gray-800">
       <div className="flex items-center">
-        <span className="text-gray-400 text-sm">{label}</span>
+        <span className="text-gray-400">{label}</span>
         {hasInfoIcon && (
-          <span className="ml-1 text-gray-500 cursor-help">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+          <span className="ml-1 text-gray-500 cursor-help" title="More information">
+            ⓘ
           </span>
         )}
       </div>
-      <div className="text-white font-medium text-sm">
-        {value}
-      </div>
+      <span className="font-medium">{value}</span>
     </div>
   );
 };

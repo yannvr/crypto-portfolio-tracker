@@ -1,23 +1,39 @@
 // CoinGecko API service for fetching cryptocurrency data
 import { API_URLS, COINGECKO_ENDPOINTS } from '../utils/constants';
 
-// Fallback map for common crypto symbols to their CoinGecko IDs
+// Canonical map for common crypto symbols to their CoinGecko IDs
 // This is used only if the dynamic lookup fails
-const fallbackSymbolToIdMap: Record<string, string> = {
-  'BTC': 'bitcoin',
-  'ETH': 'ethereum',
-  'SOL': 'solana',
-  'USDT': 'tether',
-  'BNB': 'binancecoin',
-  'XRP': 'ripple',
-  'ADA': 'cardano',
-  'DOGE': 'dogecoin',
-  'AVAX': 'avalanche-2',
-  'DOT': 'polkadot',
-  'MATIC': 'matic-network',
-  'LINK': 'chainlink',
-  'UNI': 'uniswap',
-  'SHIB': 'shiba-inu',
+const CANONICAL_COIN_IDS: Record<string, string> = {
+  'btc': 'bitcoin',
+  'eth': 'ethereum',
+  'usdt': 'tether',
+  'usdc': 'usd-coin',
+  'bnb': 'binancecoin',
+  'xrp': 'ripple',
+  'ada': 'cardano',
+  'doge': 'dogecoin',
+  'sol': 'solana',
+  'dot': 'polkadot',
+  'shib': 'shiba-inu',
+  'matic': 'matic-network',
+  'avax': 'avalanche-2',
+  'link': 'chainlink',
+  'ltc': 'litecoin',
+  'uni': 'uniswap',
+  'atom': 'cosmos',
+  'xlm': 'stellar',
+  'algo': 'algorand',
+  'etc': 'ethereum-classic',
+  'fil': 'filecoin',
+  'vet': 'vechain',
+  'icp': 'internet-computer',
+  'xmr': 'monero',
+  'xtz': 'tezos',
+  'aave': 'aave',
+  'egld': 'elrond-erd-2',
+  'axs': 'axie-infinity',
+  'theta': 'theta-token',
+  'cake': 'pancakeswap-token',
 };
 
 export interface CoinStats {
@@ -54,12 +70,12 @@ export interface CoinStats {
 }
 
 /**
- * Get the CoinGecko ID for a given symbol using the fallback map
+ * Get the CoinGecko ID for a given symbol using the canonical map
  * This is used only if the dynamic lookup fails
  */
 export const getFallbackCoinGeckoId = (symbol: string): string => {
-  const upperSymbol = symbol.toUpperCase();
-  return fallbackSymbolToIdMap[upperSymbol] || upperSymbol.toLowerCase();
+  const normalizedSymbol = symbol.toLowerCase();
+  return CANONICAL_COIN_IDS[normalizedSymbol] || normalizedSymbol;
 };
 
 /**

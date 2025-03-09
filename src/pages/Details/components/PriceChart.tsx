@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { usePriceChart, TimeInterval } from '../../../hooks/usePriceChart';
-import { useCoinData } from '../../../hooks/useCoinData';
 
 interface PriceChartProps {
   symbol: string;
+  coinStats?: any;
 }
 
 const timeIntervals: { label: string; value: TimeInterval }[] = [
@@ -15,38 +15,9 @@ const timeIntervals: { label: string; value: TimeInterval }[] = [
   { label: '1M', value: '1M' },
 ];
 
-export default function PriceChart({ symbol }: PriceChartProps) {
+export default function PriceChart({ symbol, coinStats }: PriceChartProps) {
   const [selectedInterval, setSelectedInterval] = useState<TimeInterval>('1d');
   const { chartData, isLoading, isError } = usePriceChart(symbol, selectedInterval);
-  const { coinStats } = useCoinData(symbol);
-
-  // Map of intervals to their corresponding price change percentage properties
-  const intervalToPriceChangeMap: Record<TimeInterval, (stats: typeof coinStats) => number> = {
-    '1h': () => 0, // CoinGecko doesn't provide hourly change
-    '4h': () => 0, // CoinGecko doesn't provide 4h change
-    '1d': (stats) => stats?.priceChangePercentage24h || 0,
-    '1w': (stats) => stats?.priceChangePercentage7d || 0,
-    '1M': (stats) => stats?.priceChangePercentage30d || 0,
-  };
-
-  // Get the price change percentage based on the selected interval
-  const getPriceChangePercentage = () => {
-    if (!coinStats) return 0;
-
-    // Get the appropriate function from the map and call it with coinStats
-    const getChangeForInterval = intervalToPriceChangeMap[selectedInterval] ||
-      intervalToPriceChangeMap['1d']; // Default to 1d if interval not found
-
-    return getChangeForInterval(coinStats);
-  };
-
-  const priceChangePercentage = getPriceChangePercentage();
-  const isPriceUp = priceChangePercentage >= 0;
-
-  // Format the price change percentage like in the screenshot
-  const formattedPriceChange = isPriceUp ?
-    `${priceChangePercentage.toFixed(2)}%` :
-    `-${Math.abs(priceChangePercentage).toFixed(2)}%`;
 
   // Calculates the value using the min and max values of the chart data
   const yAxisDomain = useMemo(() => {
@@ -84,9 +55,6 @@ export default function PriceChart({ symbol }: PriceChartProps) {
       <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center mb-4">
         <div className="flex items-center mb-2 xs:mb-0">
           <h3 className="text-lg font-semibold text-white mr-2">Price Chart</h3>
-          <span className={`text-sm ${isPriceUp ? 'text-green-500' : 'text-red-500'}`}>
-            {formattedPriceChange}
-          </span>
         </div>
         <div className="flex space-x-1 bg-gray-900 rounded-lg p-1 self-start xs:self-auto">
           {timeIntervals.map((interval) => (
@@ -127,10 +95,10 @@ export default function PriceChart({ symbol }: PriceChartProps) {
           />
           <Line
             dataKey="price"
-            stroke={isPriceUp ? "#66ff66" : "#ff6666"}
+            stroke="#66ff66"
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 4, fill: isPriceUp ? "#66ff66" : "#ff6666" }}
+            activeDot={{ r: 4, fill: "#66ff66" }}
           />
         </LineChart>
       </ResponsiveContainer>
