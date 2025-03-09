@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { usePriceStream } from '@store/usePriceStreamStore';
-import PriceBadge from '@components/PriceBadge';
+import { usePriceStream } from '../store/usePriceStreamStore';
 import { formatCurrency } from '../utils/formatters';
+import PriceBadge from './PriceBadge';
 
 interface AssetCardProps {
   asset: {
@@ -46,7 +46,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 
         <div className="text-gray-400 mt-2 text-sm">
           <p>Quantity: {asset.quantity}</p>
-          <p>Current Price: ${currentPrice?.toLocaleString() || 'N/A'}</p>
+          <p>Current Price: {currentPrice ? formatCurrency(currentPrice) : 'Loading...'}</p>
         </div>
       </div>
     </Link>

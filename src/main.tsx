@@ -6,9 +6,9 @@ import './index.css'; // Import Tailwind CSS
 import { swrConfig, fetcher } from './utils/swrConfig';
 
 createRoot(document.getElementById('root')!).render(
-  <SWRConfig 
-    value={{ 
-      ...swrConfig, 
+  <SWRConfig
+    value={{
+      ...swrConfig,
       fetcher,
       // Enable revalidation on focus for better UX
       revalidateOnFocus: true,

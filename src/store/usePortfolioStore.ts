@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface Asset {
+export interface Asset {
   id: number;
   symbol: string;
   quantity: number;
@@ -9,27 +9,54 @@ interface Asset {
 
 interface PortfolioState {
   assets: Asset[];
-  addAsset: (asset: Asset) => void;
+  nextId: number;
+  // Actions
+  addAsset: (symbol: string, quantity: number) => void;
   removeAsset: (id: number) => void;
-  editAsset: (updatedAsset: Asset) => void;
+  editAsset: (id: number, updates: Partial<Omit<Asset, 'id'>>) => void;
   selectAsset: (id?: string) => Asset | undefined;
+  // Computed values
+  getTotalAssets: () => number;
 }
 
+/**
+ * Store for managing the user's portfolio of crypto assets
+ * Uses persistence to save data between sessions
+ */
 const usePortfolioStore = create<PortfolioState>()(
   persist<PortfolioState>(
     (set, get) => ({
-      assets: [
-      ],
-      addAsset: asset => set(state => ({ assets: [...state.assets, asset] })),
-      removeAsset: id =>
-        set(state => ({
-          assets: state.assets.filter(asset => asset.id !== id),
+      assets: [],
+      nextId: 1,
+
+      addAsset: (symbol, quantity) =>
+        set((state) => {
+          const newAsset = {
+            id: state.nextId,
+            symbol: symbol.toUpperCase(),
+            quantity,
+          };
+          return {
+            assets: [...state.assets, newAsset],
+            nextId: state.nextId + 1,
+          };
+        }),
+
+      removeAsset: (id) =>
+        set((state) => ({
+          assets: state.assets.filter((asset) => asset.id !== id),
         })),
-      editAsset: updatedAsset =>
-        set(state => ({
-          assets: state.assets.map(asset => (asset.id === updatedAsset.id ? updatedAsset : asset)),
+
+      editAsset: (id, updates) =>
+        set((state) => ({
+          assets: state.assets.map((asset) =>
+            asset.id === id ? { ...asset, ...updates } : asset
+          ),
         })),
-        selectAsset: id => id ? get().assets.find(asset => asset.id === Number(id)) : undefined,
+
+      selectAsset: (id) => id ? get().assets.find(asset => asset.id === Number(id)) : undefined,
+
+      getTotalAssets: () => get().assets.length,
     }),
     {
       name: 'portfolio-storage', // name of the item in the storage (must be unique)

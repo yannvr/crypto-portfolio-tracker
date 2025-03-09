@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { usePriceChart } from '../hooks/usePriceChart';
 
@@ -8,6 +8,19 @@ interface PriceChartProps {
 
 export default function PriceChart({ symbol }: PriceChartProps) {
   const { chartData, isLoading, isError } = usePriceChart(symbol);
+
+  // Calculates the value using the min and max values of the chart data
+  const yAxisDomain = useMemo(() => {
+    if (!chartData.length) return [0, 0];
+
+    const prices = chartData.map(d => d.price);
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    // Add 2% padding to min and max
+    const padding = (max - min) * 0.02;
+    return [min - padding, max + padding];
+  }, [chartData]);
 
   if (isLoading) {
     return (
@@ -31,12 +44,16 @@ export default function PriceChart({ symbol }: PriceChartProps) {
     <ResponsiveContainer width="100%" height={250}>
       <LineChart data={chartData} className="bg-black">
         <XAxis dataKey="date" tick={{ fill: '#bbb' }} />
-        <YAxis tick={{ fill: '#bbb' }} tickFormatter={(value) => `$${value.toFixed(2)}`} />
+        <YAxis
+          domain={yAxisDomain}
+          tick={{ fill: '#bbb' }}
+          tickFormatter={(value) => `$${value.toFixed(2)}`}
+        />
         <Tooltip
           contentStyle={{ backgroundColor: 'black', border: 'none', color: 'white' }}
           formatter={(value: number) => `$${value.toFixed(2)}`}
         />
-        <Line type="monotone" dataKey="price" stroke="#66ff66" strokeWidth={2} dot={false} />
+        <Line dataKey="price" stroke="#66ff66" strokeWidth={2} dot={false} />
       </LineChart>
     </ResponsiveContainer>
   );

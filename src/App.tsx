@@ -7,14 +7,16 @@ import PageNotFound from './pages/PageNotFound';
 
 export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/add" element={<AddEditHolding />} />
-        <Route path="/edit/:id" element={<AddEditHolding />} />
-        <Route path="/details/:id" element={<Details />} />
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
-    </Router>
+    <div className="min-h-screen bg-gray-900">
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/add" element={<AddEditHolding />} />
+          <Route path="/edit/:id" element={<AddEditHolding />} />
+          <Route path="/details/:id" element={<Details />} />
+          <Route path="*" element={<PageNotFound />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }

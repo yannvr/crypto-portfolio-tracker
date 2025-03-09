@@ -1,10 +1,10 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Button from '@components/ui/Button';
-import ErrorMessage from '@components/ui/ErrorMessage';
-import NumberInput from '@components/ui/NumberInput';
-import TextInput from '@components/ui/TextInput';
-import usePortfolioStore from '@store/usePortfolioStore';
+import Button from '../components/ui/Button';
+import ErrorMessage from '../components/ui/ErrorMessage';
+import NumberInput from '../components/ui/NumberInput';
+import TextInput from '../components/ui/TextInput';
+import { usePortfolioStore } from '../store';
 
 interface FormState {
   symbol: string;
@@ -43,13 +43,15 @@ export default function AddEditHolding() {
     if (!validateForm()) return;
 
     if (editingAsset) {
-      editAsset({ ...editingAsset, symbol: form.symbol.toUpperCase(), quantity: parseFloat(form.quantity) });
-    } else {
-      addAsset({
-        id: Date.now(),
+      editAsset(editingAsset.id, {
         symbol: form.symbol.toUpperCase(),
-        quantity: parseFloat(form.quantity),
+        quantity: parseFloat(form.quantity)
       });
+    } else {
+      addAsset(
+        form.symbol.toUpperCase(),
+        parseFloat(form.quantity)
+      );
     }
 
     navigate('/');

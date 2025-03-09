@@ -1,11 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import usePortfolioStore from '@store/usePortfolioStore';
-import usePriceStreamStore from '@store/usePriceStreamStore';
-import AssetCard from '@components/AssetCard';
-import TextInput from '@components/ui/TextInput';
-import Button from '@components/ui/Button';
-import Select from '@components/ui/Select';
+import { usePortfolioStore, usePriceStreamStore } from '../store';
+import AssetCard from '../components/AssetCard';
+import TextInput from '../components/ui/TextInput';
+import Button from '../components/ui/Button';
+import Select from '../components/ui/Select';
+import { usePriceStream } from '../store/usePriceStreamStore';
+import { formatCurrency } from '../utils/formatters';
 
 type SortOption = 'name' | 'value';
 
@@ -14,6 +15,14 @@ export default function Home() {
   const { prices } = usePriceStreamStore();
   const [sortOption, setSortOption] = useState<SortOption>('name');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Calculate total portfolio value
+  const totalPortfolioValue = useMemo(() => {
+    return assets.reduce((total, asset) => {
+      const price = prices[asset.symbol] || 0;
+      return total + (price * asset.quantity);
+    }, 0);
+  }, [assets, prices]);
 
   const filteredAndSortedAssets = useMemo(() => {
     const filtered = assets.filter(asset =>
@@ -34,8 +43,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-8">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
+          <p className="text-gray-400 mt-1">
+            {assets.length} {assets.length === 1 ? 'Asset' : 'Assets'} • Total Value: {formatCurrency(totalPortfolioValue)}
+          </p>
+        </div>
         <Link to="/add">
           <Button>+ Asset</Button>
         </Link>
@@ -63,8 +77,12 @@ export default function Home() {
             <AssetCard key={asset.id} asset={asset} />
           ))
         ) : (
-          <div className="col-span-full text-center text-gray-400">
-            Add an asset to view your portfolio
+          <div className="col-span-full text-center text-gray-400 py-12 bg-gray-900 rounded-lg">
+            <p className="text-xl mb-4">Your portfolio is empty</p>
+            <p className="mb-6">Add your first asset to start tracking your crypto investments</p>
+            <Link to="/add">
+              <Button>Add Your First Asset</Button>
+            </Link>
           </div>
         )}
       </main>
