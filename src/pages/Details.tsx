@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import AssetDetails from '@components/AssetDetails';
+import AssetDetails from './Details/components/AssetDetails';
 import usePortfolioStore from '@store/usePortfolioStore';
 
 export default function Details() {
