@@ -11,11 +11,5 @@ export default function Details() {
     return <div className="text-white text-center mt-10">Asset not found</div>;
   }
 
-  return (
-    <div className="min-h-screen bg-black text-white flex justify-center items-center px-6">
-      <div className="w-full max-w-4xl bg-gray-900/80 rounded-xl p-6 shadow-lg border border-gray-800 backdrop-blur-md">
-        <AssetDetails asset={asset} />
-      </div>
-    </div>
-  );
+  return <AssetDetails asset={asset} />;
 }

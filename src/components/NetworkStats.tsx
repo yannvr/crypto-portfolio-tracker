@@ -1,49 +1,23 @@
 import React from 'react';
-import { CoinStats } from '../services/coinGeckoService';
+import { useCoinData } from '../hooks/useCoinData';
+import { formatCurrency, formatNumber } from '../utils/formatters';
 
 interface NetworkStatsProps {
-  stats: CoinStats | null;
-  isLoading: boolean;
-  symbol?: string;
+  symbol: string;
 }
 
-interface StatItemProps {
-  label: string;
-  value: string | number | null;
-  tooltip?: string;
-}
+const NetworkStats: React.FC<NetworkStatsProps> = ({ symbol }) => {
+  const { coinStats, isLoading } = useCoinData(symbol);
 
-const StatItem: React.FC<StatItemProps> = ({ label, value, tooltip }) => {
-  return (
-    <div className="border-b border-gray-700 py-3 flex justify-between items-center">
-      <div className="flex items-center">
-        <span className="text-gray-400">{label}</span>
-        {tooltip && (
-          <div className="ml-1 text-gray-500 cursor-help relative group">
-            <span className="inline-block w-4 h-4 rounded-full border border-gray-500 text-xs text-center">i</span>
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-xs text-gray-300 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-              {tooltip}
-            </div>
-          </div>
-        )}
-      </div>
-      <div className="text-white font-medium">
-        {value !== null ? value : 'N/A'}
-      </div>
-    </div>
-  );
-};
-
-const NetworkStats: React.FC<NetworkStatsProps> = ({ stats, isLoading, symbol }) => {
-  if (isLoading) {
+  if (isLoading || !coinStats) {
     return (
-      <div className="mt-8 bg-black rounded-lg p-4">
-        <h3 className="text-xl font-bold mb-4">Network Statistics</h3>
-        <div className="animate-pulse">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="border-b border-gray-700 py-3 flex justify-between">
-              <div className="bg-gray-800 h-4 w-24 rounded"></div>
-              <div className="bg-gray-800 h-4 w-32 rounded"></div>
+      <div className="bg-black rounded-lg p-4 md:p-6 h-full">
+        <h3 className="text-lg md:text-xl font-bold mb-4">{symbol} Network Statistics</h3>
+        <div className="animate-pulse space-y-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="flex justify-between">
+              <div className="bg-gray-800 h-5 w-24 rounded"></div>
+              <div className="bg-gray-800 h-5 w-20 rounded"></div>
             </div>
           ))}
         </div>
@@ -51,63 +25,70 @@ const NetworkStats: React.FC<NetworkStatsProps> = ({ stats, isLoading, symbol })
     );
   }
 
-  if (!stats) {
-    return null;
-  }
-
-  const formatNumber = (num: number): string => {
-    if (num >= 1_000_000_000) {
-      return `$${(num / 1_000_000_000).toFixed(2)}B`;
-    } else if (num >= 1_000_000) {
-      return `$${(num / 1_000_000).toFixed(2)}M`;
-    } else {
-      return `$${num.toLocaleString()}`;
-    }
-  };
-
-  const formatSupply = (num: number): string => {
-    return num.toLocaleString();
-  };
-
   return (
-    <div className="mt-8 bg-black rounded-lg p-4">
-      <h3 className="text-xl font-bold mb-4">Network Statistics</h3>
+    <div className="bg-black rounded-lg p-4 md:p-6 h-full">
+      <h3 className="text-lg md:text-xl font-bold mb-4">{symbol} Network Statistics</h3>
 
-      <StatItem
-        label="Market Cap"
-        value={formatNumber(stats.marketCap)}
-        tooltip="Total value of all coins in circulation"
-      />
+      <div className="space-y-4">
+        <StatItem
+          label="Market Cap"
+          value={formatCurrency(coinStats.marketCap)}
+          hasInfoIcon={true}
+        />
 
-      <StatItem
-        label="Fully Diluted Valuation"
-        value={formatNumber(stats.fullyDilutedValuation)}
-        tooltip="Market cap if the max supply was in circulation"
-      />
+        <StatItem
+          label="Fully Diluted Valuation"
+          value={formatCurrency(coinStats.fullyDilutedValuation)}
+          hasInfoIcon={true}
+        />
 
-      <StatItem
-        label="24 Hour Trading Vol"
-        value={formatNumber(stats.tradingVolume24h)}
-        tooltip="Total trading volume in the last 24 hours"
-      />
+        <StatItem
+          label="24 Hour Trading Vol"
+          value={formatCurrency(coinStats.tradingVolume24h)}
+        />
 
-      <StatItem
-        label="Circulating Supply"
-        value={formatSupply(stats.circulatingSupply)}
-        tooltip="Number of coins currently in circulation"
-      />
+        <StatItem
+          label="Circulating Supply"
+          value={formatNumber(coinStats.circulatingSupply)}
+          hasInfoIcon={true}
+        />
 
-      <StatItem
-        label="Total Supply"
-        value={formatSupply(stats.totalSupply)}
-        tooltip="Total amount of coins created (minus any that have been verifiably burned)"
-      />
+        <StatItem
+          label="Total Supply"
+          value={formatNumber(coinStats.totalSupply)}
+        />
 
-      <StatItem
-        label="Max Supply"
-        value={stats.maxSupply !== null ? formatSupply(stats.maxSupply) : 'Unlimited'}
-        tooltip="Maximum number of coins that will ever exist"
-      />
+        <StatItem
+          label="Max Supply"
+          value={coinStats.maxSupply !== null ? formatNumber(coinStats.maxSupply) : 'Unlimited'}
+        />
+      </div>
+    </div>
+  );
+};
+
+interface StatItemProps {
+  label: string;
+  value: string;
+  hasInfoIcon?: boolean;
+}
+
+const StatItem: React.FC<StatItemProps> = ({ label, value, hasInfoIcon = false }) => {
+  return (
+    <div className="flex justify-between items-center border-b border-gray-800 pb-2">
+      <div className="flex items-center">
+        <span className="text-gray-400 text-sm">{label}</span>
+        {hasInfoIcon && (
+          <span className="ml-1 text-gray-500 cursor-help">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        )}
+      </div>
+      <div className="text-white font-medium text-sm">
+        {value}
+      </div>
     </div>
   );
 };

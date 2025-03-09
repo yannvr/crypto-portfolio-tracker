@@ -27,6 +27,30 @@ export interface CoinStats {
   circulatingSupply: number;
   totalSupply: number;
   maxSupply: number | null;
+  // Additional information
+  name: string;
+  description: string;
+  image: {
+    thumb: string;
+    small: string;
+    large: string;
+  };
+  categories: string[];
+  website: string;
+  priceChangePercentage24h: number;
+  priceChangePercentage7d: number;
+  priceChangePercentage30d: number;
+  priceChangePercentage1y: number;
+  allTimeHigh: {
+    price: number;
+    date: string;
+    percentFromATH: number;
+  };
+  allTimeLow: {
+    price: number;
+    date: string;
+    percentFromATL: number;
+  };
 }
 
 /**
@@ -60,6 +84,30 @@ export const fetchCoinStats = async (coinId: string): Promise<CoinStats | null> 
       circulatingSupply: data.market_data.circulating_supply || 0,
       totalSupply: data.market_data.total_supply || 0,
       maxSupply: data.market_data.max_supply,
+      // Additional information
+      name: data.name || '',
+      description: data.description?.en || '',
+      image: {
+        thumb: data.image?.thumb || '',
+        small: data.image?.small || '',
+        large: data.image?.large || '',
+      },
+      categories: data.categories || [],
+      website: data.links?.homepage?.[0] || '',
+      priceChangePercentage24h: data.market_data?.price_change_percentage_24h || 0,
+      priceChangePercentage7d: data.market_data?.price_change_percentage_7d || 0,
+      priceChangePercentage30d: data.market_data?.price_change_percentage_30d || 0,
+      priceChangePercentage1y: data.market_data?.price_change_percentage_1y || 0,
+      allTimeHigh: {
+        price: data.market_data?.ath?.usd || 0,
+        date: data.market_data?.ath_date?.usd || '',
+        percentFromATH: data.market_data?.ath_change_percentage?.usd || 0,
+      },
+      allTimeLow: {
+        price: data.market_data?.atl?.usd || 0,
+        date: data.market_data?.atl_date?.usd || '',
+        percentFromATL: data.market_data?.atl_change_percentage?.usd || 0,
+      },
     };
   } catch (error) {
     console.error(`Error fetching coin stats for ${coinId}:`, error);
