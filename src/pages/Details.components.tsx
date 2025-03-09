@@ -41,33 +41,62 @@ export const AssetInfoCard: React.FC<{
   coinData: any;
   currentPrice: number;
   totalValue: number;
-}> = ({ asset, coinData, currentPrice, totalValue }) => (
-  <div className="lg:col-span-1 bg-gray-900/80 border border-gray-800 rounded-xl p-6">
-    <div className="flex items-center gap-4 mb-6">
-      {coinData?.image?.small && (
-        <img
-          src={coinData.image.small}
-          alt={coinData.name}
-          className="w-10 h-10"
-        />
-      )}
-      <div>
-        <h2 className="text-2xl font-bold">{coinData?.name || asset.symbol}</h2>
-        <p className="text-gray-400">{asset.symbol}</p>
+}> = ({ asset, coinData, currentPrice, totalValue }) => {
+  const isLoading = !coinData || currentPrice === 0;
+
+  return (
+    <div className="lg:col-span-1 bg-gray-900/80 border border-gray-800 rounded-xl p-6">
+      <div className="flex items-center gap-4 mb-6">
+        {coinData?.image?.small ? (
+          <img
+            src={coinData.image.small}
+            alt={coinData.name}
+            className="w-10 h-10"
+          />
+        ) : (
+          <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center">
+            {asset.symbol.charAt(0)}
+          </div>
+        )}
+        <div>
+          <h2 className="text-2xl font-bold">{coinData?.name || asset.symbol}</h2>
+          <p className="text-gray-400">{asset.symbol}</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <StatItem label="Your Holdings" value={`${asset.quantity} ${asset.symbol}`} />
+        {isLoading ? (
+          <div className="py-2">
+            <p className="text-gray-400">Current Price</p>
+            <p className="text-xl font-bold text-gray-300">Loading...</p>
+          </div>
+        ) : (
+          <StatItem label="Current Price" value={formatCurrency(currentPrice)} />
+        )}
+        {isLoading ? (
+          <div className="py-2">
+            <p className="text-gray-400">Total Value</p>
+            <p className="text-xl font-bold text-gray-300">Loading...</p>
+          </div>
+        ) : (
+          <StatItem label="Total Value" value={formatCurrency(totalValue)} />
+        )}
+        {isLoading ? (
+          <div className="py-2">
+            <p className="text-gray-400">24h Change</p>
+            <p className="text-xl font-bold text-gray-300">Loading...</p>
+          </div>
+        ) : (
+          <PriceChange
+            label="24h Change"
+            value={coinData?.market_data?.price_change_percentage_24h || 0}
+          />
+        )}
       </div>
     </div>
-
-    <div className="space-y-4">
-      <StatItem label="Your Holdings" value={`${asset.quantity} ${asset.symbol}`} />
-      <StatItem label="Current Price" value={formatCurrency(currentPrice)} />
-      <StatItem label="Total Value" value={formatCurrency(totalValue)} />
-      <PriceChange
-        label="24h Change"
-        value={coinData?.market_data?.price_change_percentage_24h || 0}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 export const PriceChartCard: React.FC<{
   chartData: any[];

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { usePriceStore, usePriceStream } from '../hooks/useAssetData';
+import { usePriceStore, usePriceStream, useInitialPrices } from '../hooks/useAssetData';
 import AssetCard from './Home/components/AssetCard';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
@@ -148,6 +148,9 @@ export default function Home(): React.ReactElement {
   const { prices } = usePriceStore();
   const [sortOption, setSortOption] = useState<SortOption>('name');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch initial prices from REST API
+  useInitialPrices(assets);
 
   // Initialize price streams for all assets
   usePriceStream(assets);

@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { useCoinData, usePriceChart } from '../hooks/useAssetData';
+import { useCoinData, usePriceChart, useInitialPrices } from '../hooks/useAssetData';
 import Button from '../components/Button';
 import {
   AssetInfoCard,
@@ -27,6 +27,9 @@ export default function Details() {
 
   // Always call hooks unconditionally, but with conditional parameters
   const symbol = asset?.symbol || '';
+
+  // Fetch initial price data if we have an asset
+  useInitialPrices(asset ? [asset] : []);
 
   // Fetch coin data - always call the hook, but with empty symbol if no asset
   const { data: coinData, loading: coinLoading, error: coinError } = useCoinData(symbol);

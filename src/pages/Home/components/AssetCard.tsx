@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { formatCurrency } from '../../../utils/utils';
 import { usePriceStore } from '../../../hooks/useAssetData';
 import PriceBadge from './PriceBadge';
+import Button from '@components/Button';
 
 interface AssetCardProps {
   asset: {
@@ -16,10 +17,13 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   // Get price and price change directly from the store
   const prices = usePriceStore(state => state.prices);
   const priceChanges = usePriceStore(state => state.priceChanges);
+  const connectionStatus = usePriceStore(state => state.connectionStatus);
 
   const currentPrice = prices[asset.symbol] || 0;
   const priceChange = priceChanges[asset.symbol] || 0;
   const totalValue = currentPrice * asset.quantity;
+  const isLoading = currentPrice === 0;
+  const isConnected = connectionStatus[asset.symbol] === 'connected';
 
   return (
     <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 hover:bg-gray-800/80 transition-colors">
@@ -27,10 +31,10 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
         <h3 className="text-xl font-bold">{asset.symbol}</h3>
         <div className="flex gap-2">
           <Link to={`/edit/${asset.id}`}>
-            <button className="text-gray-400 hover:text-white">Edit</button>
+            <Button secondary>Edit</Button>
           </Link>
           <Link to={`/details/${asset.id}`}>
-            <button className="text-gray-400 hover:text-white">Details</button>
+            <Button secondary>Details</Button>
           </Link>
         </div>
       </div>
@@ -44,7 +48,15 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 
       <div className="flex justify-between items-center mt-1">
         <p className="text-sm text-gray-400">Price:</p>
-        <PriceBadge price={currentPrice} priceChange={priceChange} />
+        {isLoading ? (
+          <span className="text-gray-400 text-sm">Loading price...</span>
+        ) : (
+          <PriceBadge
+            price={currentPrice}
+            priceChange={priceChange}
+            showChange={isConnected}
+          />
+        )}
       </div>
     </div>
   );

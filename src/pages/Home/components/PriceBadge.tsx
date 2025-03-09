@@ -28,11 +28,9 @@ const PriceBadge: React.FC<PriceBadgeProps> = ({
   return (
     <div className="flex flex-col items-end">
       <span className="font-medium">{formatCurrency(price)}</span>
-      {showChange && priceChange !== undefined && (
         <span className={`text-xs ${getColorClass()}`}>
           {formattedChange()}
         </span>
-      )}
     </div>
   );
 };

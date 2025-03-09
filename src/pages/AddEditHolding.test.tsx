@@ -240,7 +240,8 @@ describe('AddEditHolding Page', () => {
     fireEvent.change(screen.getByDisplayValue('1.5'), { target: { value: '2.5' } });
 
     // Submit the form
-    fireEvent.click(screen.getByText('Save'));
+    const form = screen.getByText('Save').closest('form')!;
+    fireEvent.submit(form);
 
     // editAsset should be called with the correct values
     expect(editAsset).toHaveBeenCalledWith(1, { symbol: 'BTC', quantity: 2.5 });

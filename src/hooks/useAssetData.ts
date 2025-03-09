@@ -274,3 +274,34 @@ export function usePriceStream(
   // Only return the price in single symbol mode
   return typeof symbolsInput === 'string' ? prices[symbolsInput] || null : undefined;
 }
+
+// Hook to fetch initial prices for multiple assets at once
+export function useInitialPrices(assets: Array<{ symbol: string }>) {
+  const { setPrice } = usePriceStore();
+  const { findCoinIdBySymbol } = useCoinList();
+
+  useEffect(() => {
+    if (!assets || assets.length === 0) return;
+
+    // Get unique symbols
+    const symbols = [...new Set(assets.map(asset => asset.symbol))];
+
+    // For each symbol, find the coin ID and fetch the price
+    symbols.forEach(async (symbol) => {
+      const coinId = findCoinIdBySymbol(symbol);
+      if (!coinId) return;
+
+      try {
+        // Use the simple price endpoint for faster response
+        const url = `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.SIMPLE_PRICE(coinId)}`;
+        const data = await fetcher(url);
+
+        if (data && data[coinId] && data[coinId].usd) {
+          setPrice(symbol, data[coinId].usd);
+        }
+      } catch (error) {
+        console.error(`Error fetching initial price for ${symbol}:`, error);
+      }
+    });
+  }, [assets, findCoinIdBySymbol, setPrice]);
+}
