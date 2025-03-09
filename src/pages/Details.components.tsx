@@ -152,8 +152,9 @@ export const PriceChartCard: React.FC<{
               <CartesianGrid strokeDasharray="3 3" stroke="#333" />
               <XAxis
                 dataKey="date"
-                tick={{ fill: '#999' }}
+                tick={false}
                 axisLine={{ stroke: '#333' }}
+                tickMargin={5}
               />
               <YAxis
                 tick={{ fill: '#999' }}
@@ -164,6 +165,7 @@ export const PriceChartCard: React.FC<{
               <Tooltip
                 formatter={(value: number) => [`$${value.toFixed(2)}`, 'Price']}
                 contentStyle={{ backgroundColor: '#222', borderColor: '#444' }}
+                labelFormatter={(label) => `Date: ${label}`}
               />
               <Line
                 type="monotone"
