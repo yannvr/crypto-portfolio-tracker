@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { formatPercent } from "../utils/formatters";
+import { formatPercent } from "../../../utils/formatters";
 
 interface PriceBadgeProps {
   currentPrice: number | null;

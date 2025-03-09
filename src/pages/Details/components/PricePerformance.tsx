@@ -1,5 +1,5 @@
 import React from 'react';
-import { useCoinData } from '../hooks/useCoinData';
+import { useCoinData } from '../../../hooks/useCoinData';
 
 interface PricePerformanceProps {
   symbol: string;

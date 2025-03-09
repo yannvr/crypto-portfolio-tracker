@@ -2,9 +2,9 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolioStore, usePriceStreamStore } from '../store';
 import AssetCard from './Home/components/AssetCard';
-import TextInput from '../components/ui/TextInput';
-import Button from '../components/ui/Button';
-import Select from '../components/ui/Select';
+import TextInput from '../components/TextInput';
+import Button from '../components/Button';
+import Select from '../components/Select';
 import { usePriceStream } from '../store/usePriceStreamStore';
 import { formatCurrency } from '../utils/formatters';
 

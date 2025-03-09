@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import PriceBadge from '@components/PriceBadge';
+import PriceBadge from 'pages/Home/components/PriceBadge';
 
 describe('PriceBadge Component', () => {
   test('renders PriceBadge component correctly for positive change', () => {

@@ -1,4 +1,4 @@
-import TextInput from '@components/ui/TextInput';
+import TextInput from '@components/TextInput';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 describe('TextInput Component', () => {

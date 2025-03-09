@@ -1,4 +1,4 @@
-import NumberInput from '@components/ui/NumberInput';
+import NumberInput from '@components/NumberInput';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 describe('NumberInput Component', () => {

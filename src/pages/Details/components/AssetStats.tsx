@@ -1,6 +1,6 @@
 import React from 'react';
-import { formatCurrency, formatNumber } from '../utils/formatters';
-import { useCoinData } from '../hooks/useCoinData';
+import { formatCurrency, formatNumber } from '../../../utils/formatters';
+import { useCoinData } from '../../../hooks/useCoinData';
 
 interface AssetStatsProps {
   symbol: string;

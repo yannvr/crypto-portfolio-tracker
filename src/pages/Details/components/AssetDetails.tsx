@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { usePriceStream } from '../../../store/usePriceStreamStore';
 import { formatCurrency } from '../../../utils/formatters';
 import PriceChart from './PriceChart';
-import Button from '../../../components/ui/Button';
+import Button from '../../../components/Button';
 import { useCoinData } from '../../../hooks/useCoinData';
 import NetworkStats from './NetworkStats';
 import AboutCoin from './AboutCoin';

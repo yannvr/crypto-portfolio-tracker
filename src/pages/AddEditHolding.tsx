@@ -1,9 +1,9 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Button from '../components/ui/Button';
-import ErrorMessage from '../components/ui/ErrorMessage';
-import NumberInput from '../components/ui/NumberInput';
-import TextInput from '../components/ui/TextInput';
+import Button from '../components/Button';
+import ErrorMessage from '../components/ErrorMessage';
+import NumberInput from '../components/NumberInput';
+import TextInput from '../components/TextInput';
 import { usePortfolioStore } from '../store';
 
 interface FormState {

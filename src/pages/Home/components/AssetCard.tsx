@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePriceStream } from '../../../store/usePriceStreamStore';
 import { formatCurrency } from '../../../utils/formatters';
-import PriceBadge from '../../../components/PriceBadge';
+import PriceBadge from './PriceBadge';
 
 interface AssetCardProps {
   asset: {
