@@ -1,7 +1,7 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { useCoinData, usePriceChart, useInitialPrices } from '../hooks/useAssetData';
+import { useInitialPrices } from '../hooks/useAssetData';
 import Button from '../components/Button';
 import {
   AssetInfoCard,
@@ -17,44 +17,20 @@ export default function Details() {
   const selectAsset = usePortfolioStore(state => state.selectAsset);
   const [selectedDays, setSelectedDays] = useState(7);
 
-  // Memoize the setSelectedDays callback to prevent unnecessary re-renders
-  const handleDaysChange = useCallback((days: number) => {
-    setSelectedDays(days);
-  }, []);
-
-  // Use useMemo to prevent unnecessary re-renders when the asset doesn't change
-  const asset = useMemo(() => selectAsset(id), [id, selectAsset]);
-
-  // Always call hooks unconditionally, but with conditional parameters
-  const symbol = asset?.symbol || '';
+  // Get the asset directly without memoization
+  const asset = selectAsset(id);
 
   // Fetch initial price data if we have an asset
-  useInitialPrices(asset ? [asset] : []);
-
-  // Fetch coin data - always call the hook, but with empty symbol if no asset
-  const { data: coinData, loading: coinLoading, error: coinError } = useCoinData(symbol);
-
-  // Fetch price chart data - always call the hook, but with empty symbol if no asset
-  const { chartData, loading: chartLoading, error: chartError } = usePriceChart(symbol, selectedDays);
-
-  // Calculate y-axis domain for the chart
-  const yAxisDomain = useMemo(() => {
-    if (!chartData.length) return [0, 0] as [number, number];
-    const prices = chartData.map(d => d.price);
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const padding = (max - min) * 0.02;
-    return [min - padding, max + padding] as [number, number];
-  }, [chartData]);
+  // useInitialPrices(asset ? [asset] : []);
 
   if (!asset) {
     return <AssetNotFound />;
   }
 
-  const isLoading = coinLoading || chartLoading;
-  const hasError = coinError || chartError;
-  const currentPrice = coinData?.market_data?.current_price?.usd || 0;
-  const totalValue = currentPrice * asset.quantity;
+  // Simple function to handle days change
+  const handleDaysChange = (days: number) => {
+    setSelectedDays(days);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-8">
@@ -70,29 +46,21 @@ export default function Details() {
         </Link>
       </header>
 
-      {isLoading ? (
-        <LoadingState />
-      ) : hasError ? (
-        <ErrorState />
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <AssetInfoCard
-            asset={asset}
-            coinData={coinData}
-            currentPrice={currentPrice}
-            totalValue={totalValue}
-          />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <AssetInfoCard
+          asset={asset}
+        />
 
-          <PriceChartCard
-            chartData={chartData}
-            selectedDays={selectedDays}
-            setSelectedDays={handleDaysChange}
-            yAxisDomain={yAxisDomain}
-          />
+        <PriceChartCard
+          asset={asset}
+          selectedDays={selectedDays}
+          setSelectedDays={handleDaysChange}
+        />
 
-          <MarketStatsCard coinData={coinData} />
-        </div>
-      )}
+        <MarketStatsCard
+          asset={asset}
+        />
+      </div>
     </div>
   );
 }
