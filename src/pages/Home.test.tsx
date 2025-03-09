@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Home from './Home';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { usePriceStore, usePortfolioPriceStreams } from '../hooks/useAssetData';
+import { usePriceStore, usePriceStream } from '../hooks/useAssetData';
 
 // Mock the stores and hooks
 jest.mock('../store/usePortfolioStore', () => ({
@@ -13,7 +13,7 @@ jest.mock('../store/usePortfolioStore', () => ({
 
 jest.mock('../hooks/useAssetData', () => ({
   usePriceStore: jest.fn(),
-  usePortfolioPriceStreams: jest.fn()
+  usePriceStream: jest.fn()
 }));
 
 describe('Home Page', () => {
@@ -30,7 +30,7 @@ describe('Home Page', () => {
       prices: { BTC: 50000, ETH: 3000 }
     });
 
-    ((usePortfolioPriceStreams as unknown) as jest.Mock).mockImplementation(() => {});
+    ((usePriceStream as unknown) as jest.Mock).mockImplementation(() => {});
   });
 
   test('renders portfolio title', () => {

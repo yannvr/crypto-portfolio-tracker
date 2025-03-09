@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { usePriceStore, usePortfolioPriceStreams } from '../hooks/useAssetData';
+import { usePriceStore, usePriceStream } from '../hooks/useAssetData';
 import AssetCard from './Home/components/AssetCard';
 import TextInput from '../components/TextInput';
 import Button from '../components/Button';
@@ -34,9 +34,6 @@ interface AssetGridProps {
 
 // ===== Components =====
 
-/**
- * Displays the portfolio header with summary information and add button
- */
 const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({ assetCount, totalValue }) => (
   <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
     <div>
@@ -51,9 +48,6 @@ const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({ assetCount, totalValu
   </header>
 );
 
-/**
- * Provides search and sort controls for the portfolio
- */
 const FilterControls: React.FC<FilterControlsProps> = ({
   searchTerm,
   setSearchTerm,
@@ -79,9 +73,7 @@ const FilterControls: React.FC<FilterControlsProps> = ({
   </div>
 );
 
-/**
- * Displays a message when the portfolio is empty
- */
+
 const EmptyPortfolio: React.FC = () => (
   <div className="col-span-full text-center text-gray-400 py-12 bg-gray-900 rounded-lg">
     <p className="text-xl mb-4">Your portfolio is empty</p>
@@ -92,9 +84,7 @@ const EmptyPortfolio: React.FC = () => (
   </div>
 );
 
-/**
- * Renders a grid of asset cards or empty state
- */
+
 const AssetGrid: React.FC<AssetGridProps> = ({ assets }) => (
   <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
     {assets.length > 0 ? (
@@ -109,10 +99,7 @@ const AssetGrid: React.FC<AssetGridProps> = ({ assets }) => (
 
 // ===== Custom Hooks =====
 
-/**
- * Hook to filter and sort assets based on search term and sort option
- * @returns Filtered and sorted array of assets
- */
+
 const useFilteredAndSortedAssets = (
   assets: Asset[],
   prices: Record<string, number | null>,
@@ -142,10 +129,6 @@ const useFilteredAndSortedAssets = (
   }, [assets, prices, sortOption, searchTerm]);
 };
 
-/**
- * Hook to calculate the total value of all assets in the portfolio
- * @returns Total portfolio value in USD
- */
 const useTotalPortfolioValue = (
   assets: Array<{ symbol: string; quantity: number }>,
   prices: Record<string, number | null>
@@ -158,9 +141,7 @@ const useTotalPortfolioValue = (
   }, [assets, prices]);
 };
 
-/**
- * Main Home component that displays the portfolio dashboard
- */
+
 export default function Home(): React.ReactElement {
   // State and store hooks
   const { assets } = usePortfolioStore();
@@ -169,7 +150,7 @@ export default function Home(): React.ReactElement {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Initialize price streams for all assets
-  usePortfolioPriceStreams(assets);
+  usePriceStream(assets);
 
   // Derived state using custom hooks
   const totalPortfolioValue = useTotalPortfolioValue(assets, prices);

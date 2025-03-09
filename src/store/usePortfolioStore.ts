@@ -19,16 +19,11 @@ interface PortfolioState {
   getTotalAssets: () => number;
 }
 
-/**
- * Store for managing the user's portfolio of crypto assets
- * Uses persistence to save data between sessions
- */
 const usePortfolioStore = create<PortfolioState>()(
   persist<PortfolioState>(
     (set, get) => ({
       assets: [],
       nextId: 1,
-
       addAsset: (symbol, quantity) =>
         set((state) => {
           const newAsset = {
@@ -41,21 +36,17 @@ const usePortfolioStore = create<PortfolioState>()(
             nextId: state.nextId + 1,
           };
         }),
-
       removeAsset: (id) =>
         set((state) => ({
           assets: state.assets.filter((asset) => asset.id !== id),
         })),
-
       editAsset: (id, updates) =>
         set((state) => ({
           assets: state.assets.map((asset) =>
             asset.id === id ? { ...asset, ...updates } : asset
           ),
         })),
-
       selectAsset: (id) => id ? get().assets.find(asset => asset.id === Number(id)) : undefined,
-
       getTotalAssets: () => get().assets.length,
     }),
     {

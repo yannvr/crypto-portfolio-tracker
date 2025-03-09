@@ -1,9 +1,10 @@
-import React, { useEffect, useState, FormEvent } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import ErrorMessage from '../components/ErrorMessage';
 import NumberInput from '../components/NumberInput';
 import TextInput from '../components/TextInput';
+import { useCoinList } from '../hooks/useAssetData';
 import usePortfolioStore from '../store/usePortfolioStore';
 
 // Types
@@ -17,13 +18,11 @@ interface FormErrors {
   quantity?: string;
 }
 
-/**
- * Component for adding or editing a portfolio asset
- */
 export default function AddEditHolding() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addAsset, editAsset, removeAsset, selectAsset } = usePortfolioStore();
+  const { addAsset, editAsset, removeAsset, selectAsset, assets } = usePortfolioStore();
+  const { coins, loading, findCoinIdBySymbol } = useCoinList();
 
   const [form, setForm] = useState<FormState>({ symbol: '', quantity: '' });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -43,9 +42,21 @@ export default function AddEditHolding() {
   // Validate form fields
   const validateForm = () => {
     const newErrors: FormErrors = {};
+    const trimmedSymbol = form.symbol.trim().toUpperCase();
 
-    if (!form.symbol.trim()) {
+    if (!trimmedSymbol) {
       newErrors.symbol = 'Token symbol is required';
+    } else if (!loading && !findCoinIdBySymbol(trimmedSymbol)) {
+      newErrors.symbol = 'Invalid token symbol. Please enter a valid cryptocurrency symbol.';
+    } else {
+      // Check if symbol already exists in portfolio (only for new assets)
+      const symbolExists = !editingAsset && assets.some(
+        asset => asset.symbol.toUpperCase() === trimmedSymbol
+      );
+
+      if (symbolExists) {
+        newErrors.symbol = 'This token is already in your portfolio. Edit the existing entry instead.';
+      }
     }
 
     if (!form.quantity || Number(form.quantity) <= 0) {
@@ -95,6 +106,7 @@ export default function AddEditHolding() {
           {editingAsset ? 'Edit Asset' : 'Add New Asset'}
         </h2>
 
+        {/* using the form element is best for accessibility */}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <TextInput

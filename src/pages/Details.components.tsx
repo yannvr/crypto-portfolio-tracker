@@ -153,7 +153,6 @@ export const MarketStatsCard: React.FC<{ coinData: any }> = ({ coinData }) => (
   </div>
 );
 
-// Loading and error components
 export const LoadingState: React.FC = () => (
   <div className="text-center py-12">
     <div className="animate-pulse">

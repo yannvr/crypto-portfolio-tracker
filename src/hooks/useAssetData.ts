@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import useSWR from 'swr';
 import { create } from 'zustand';
-import { API_URLS, ENDPOINTS, SWR_CONFIG, fetcher } from '../services/apiService';
+import { API_URLS, ENDPOINTS, fetcher } from '../services/apiService';
 
 // ===== Types =====
 
@@ -35,6 +35,21 @@ export interface ChartData {
   price: number;
 }
 
+// ===== SWR Configuration =====
+
+// Default SWR configuration to prevent rate limiting
+export const SWR_CONFIG = {
+  refreshInterval: 0, // Disable auto-refresh to avoid rate limiting
+  revalidateOnFocus: false, // Disable revalidation on focus like changing tabs
+};
+
+// Extended SWR configuration with caching options
+export const CACHED_SWR_CONFIG = {
+  ...SWR_CONFIG,
+  dedupingInterval: 24 * 60 * 60 * 1000, // 24 hours
+  revalidateIfStale: false,
+};
+
 // ===== Price Stream Store =====
 
 interface PriceState {
@@ -49,9 +64,7 @@ interface PriceState {
   clearPrices: () => void;
 }
 
-/**
- * Store for managing real-time price data
- */
+// Store for managing real-time price data
 export const usePriceStore = create<PriceState>()((set) => ({
   prices: {},
   previousPrices: {},
@@ -92,6 +105,7 @@ export const usePriceStore = create<PriceState>()((set) => ({
 // ===== Canonical Coin IDs =====
 
 // Map for common crypto symbols to their CoinGecko IDs
+// This is needed because the CoinGecko API returns different IDs for the same coin!
 const CANONICAL_COIN_IDS: Record<string, string> = {
   'btc': 'bitcoin',
   'eth': 'ethereum',
@@ -112,21 +126,12 @@ const CANONICAL_COIN_IDS: Record<string, string> = {
 
 // ===== Hooks =====
 
-/**
- * Hook to fetch and manage the list of available coins
- * @returns Object containing coin list and functions to work with it
- */
+// Hook to fetch and manage the list of available coins
 export function useCoinList() {
   const { data, error, isLoading } = useSWR<Coin[]>(
     `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.COINS_LIST}`,
     fetcher,
-    {
-      ...SWR_CONFIG.COINGECKO,
-      dedupingInterval: 24 * 60 * 60 * 1000, // 24 hours
-      refreshInterval: 0, // Don't auto-refresh
-      revalidateOnFocus: false,
-      revalidateIfStale: false,
-    }
+    CACHED_SWR_CONFIG
   );
 
   const findCoinIdBySymbol = useCallback(
@@ -155,11 +160,7 @@ export function useCoinList() {
   };
 }
 
-/**
- * Hook to fetch and manage coin data
- * @param symbol The symbol of the coin (e.g., 'BTC')
- * @returns Object containing coin data and loading state
- */
+// Hook to fetch and manage coin data
 export function useCoinData(symbol: string) {
   const { findCoinIdBySymbol } = useCoinList();
   const { setPrice } = usePriceStore();
@@ -171,7 +172,7 @@ export function useCoinData(symbol: string) {
   const { data, error, isLoading } = useSWR(
     coinId ? `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.COIN_DETAILS(coinId)}` : null,
     fetcher,
-    SWR_CONFIG.COINGECKO
+    SWR_CONFIG
   );
 
   // Update price in store when data changes
@@ -188,23 +189,14 @@ export function useCoinData(symbol: string) {
   };
 }
 
-/**
- * Hook to fetch and format price history data for charts
- * @param symbol The symbol of the coin (e.g., 'BTC')
- * @param days Number of days of history to fetch
- * @returns Object containing chart data and loading state
- */
+// Hook to fetch and format price history data for charts
 export function usePriceChart(symbol: string, days = 7) {
   const { findCoinIdBySymbol } = useCoinList();
-
-  // Get coin ID
   const coinId = findCoinIdBySymbol(symbol) || symbol.toLowerCase();
-
-  // Fetch price history
   const { data, error, isLoading } = useSWR(
     coinId ? `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.MARKET_CHART(coinId, days)}` : null,
     fetcher,
-    SWR_CONFIG.COINGECKO
+    SWR_CONFIG
   );
 
   // Format data for chart
@@ -222,92 +214,52 @@ export function usePriceChart(symbol: string, days = 7) {
   };
 }
 
-/**
- * Hook to subscribe to real-time price updates for a specific asset
- * @param symbol The symbol of the asset to subscribe to (e.g., 'BTC')
- * @param onError Optional callback for handling WebSocket errors
- * @returns The current price of the asset
- */
-export function usePriceStream(symbol: string, onError?: (message: string) => void) {
+// Hook to initialize price streams for one or multiple assets
+export function usePriceStream(
+  symbolsInput: string | Array<{ symbol: string }>,
+  onError?: (message: string) => void
+) {
   const { prices, setPrice, setConnectionStatus } = usePriceStore();
 
   useEffect(() => {
-    // Use constants for WebSocket URL
-    const wsUrl = `${API_URLS.BINANCE_WS_BASE_URL}/${ENDPOINTS.BINANCE_WS.MINI_TICKER(symbol)}`;
-    const ws = new WebSocket(wsUrl);
-
-    // Set connection status to connected when the WebSocket opens
-    ws.onopen = () => {
-      setConnectionStatus(symbol, 'connected');
-    };
-
-    // Update price when a message is received
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        setPrice(symbol, parseFloat(data.c));
-      } catch (error) {
-        console.error(`Error parsing WebSocket data for ${symbol}:`, error);
-      }
-    };
-
-    // Handle WebSocket errors
-    ws.onerror = () => {
-      setConnectionStatus(symbol, 'error');
-      onError?.(`WebSocket error for ${symbol}`);
-    };
-
-    // Handle WebSocket disconnections
-    ws.onclose = () => {
-      setConnectionStatus(symbol, 'disconnected');
-    };
-
-    // Clean up WebSocket connection when the component unmounts
-    return () => {
-      ws.close();
-    };
-  }, [symbol, onError, setPrice, setConnectionStatus]);
-
-  return prices[symbol] || null;
-}
-
-/**
- * Hook to initialize price streams for all assets in a portfolio
- * @param assets Array of assets with symbols
- */
-export function usePortfolioPriceStreams(assets: Array<{ symbol: string }>) {
-  useEffect(() => {
-    const symbols = assets.map(asset => asset.symbol);
+    // Handle both single symbol string and array of assets
+    const symbols = typeof symbolsInput === 'string'
+      ? [symbolsInput]
+      : symbolsInput.map(asset => asset.symbol);
 
     // Create WebSocket connections for each symbol
     const connections = symbols.map(symbol => {
       const wsUrl = `${API_URLS.BINANCE_WS_BASE_URL}/${ENDPOINTS.BINANCE_WS.MINI_TICKER(symbol)}`;
       const ws = new WebSocket(wsUrl);
-      const { setPrice, setConnectionStatus } = usePriceStore.getState();
 
-      // Set connection status to connected when the WebSocket opens
+      // For multiple symbols mode, we need to get the store methods directly
+      // since we're inside a map function and can't use the destructured values
+      const storeActions = typeof symbolsInput === 'string'
+        ? { setPrice, setConnectionStatus }
+        : usePriceStore.getState();
+
       ws.onopen = () => {
-        setConnectionStatus(symbol, 'connected');
+        storeActions.setConnectionStatus(symbol, 'connected');
       };
 
-      // Update price when a message is received
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          setPrice(symbol, parseFloat(data.c));
+          storeActions.setPrice(symbol, parseFloat(data.c));
         } catch (error) {
           console.error(`Error parsing WebSocket data for ${symbol}:`, error);
         }
       };
 
-      // Handle WebSocket errors
       ws.onerror = () => {
-        setConnectionStatus(symbol, 'error');
+        storeActions.setConnectionStatus(symbol, 'error');
+        if (typeof symbolsInput === 'string') {
+          onError?.(`WebSocket error for ${symbol}`);
+        }
       };
 
-      // Handle WebSocket disconnections
       ws.onclose = () => {
-        setConnectionStatus(symbol, 'disconnected');
+        storeActions.setConnectionStatus(symbol, 'disconnected');
       };
 
       return ws;
@@ -317,5 +269,8 @@ export function usePortfolioPriceStreams(assets: Array<{ symbol: string }>) {
     return () => {
       connections.forEach(ws => ws.close());
     };
-  }, [assets]); // Re-run when assets change
+  }, [symbolsInput, onError, setPrice, setConnectionStatus]);
+
+  // Only return the price in single symbol mode
+  return typeof symbolsInput === 'string' ? prices[symbolsInput] || null : undefined;
 }
