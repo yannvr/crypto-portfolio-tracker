@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { API_URLS, BINANCE_WS_ENDPOINTS } from '../utils/constants';
 
 interface PriceStreamState {
   prices: Record<string, number | null>;
@@ -26,7 +27,9 @@ export function usePriceStream(assetSymbol: string, onError?: (message: string) 
   const { prices, setPrice } = usePriceStreamStore();
 
   useEffect(() => {
-    const ws = new WebSocket(`wss://stream.binance.com:443/ws/${assetSymbol.toLowerCase()}usdt@miniTicker`);
+    // Use constants for WebSocket URL
+    const wsUrl = `${API_URLS.BINANCE_WS_BASE_URL}/${BINANCE_WS_ENDPOINTS.MINI_TICKER(assetSymbol)}`;
+    const ws = new WebSocket(wsUrl);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);

@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { usePriceStream } from '@store/usePriceStreamStore';
-import Button from '@components/ui/Button';
-import PriceChart from '@components/PriceChart';
+import { usePriceStreamSWR } from '../hooks/usePriceStreamSWR';
+import { formatCurrency } from '../utils/formatters';
+import AssetStats from './AssetStats';
+import PriceChart from './PriceChart';
+import Button from './ui/Button';
 
 interface AssetDetailsProps {
   asset: {
@@ -14,40 +16,39 @@ interface AssetDetailsProps {
 
 export default function AssetDetails({ asset }: AssetDetailsProps) {
   const navigate = useNavigate();
-  const currentPrice = usePriceStream(asset.symbol);
-  const totalValue = currentPrice ? currentPrice * asset.quantity : 0;
-  const priceChange = currentPrice ? currentPrice * 0.0111 : 0; // Mocked percentage change
-  const priceChangeColor = priceChange >= 0 ? 'text-green-400' : 'text-red-400';
+
+  // Use SWR hook for price data fetching
+  const { price: currentPrice, isLoading: isPriceLoading } = usePriceStreamSWR(asset.symbol);
+
+  // Calculate total value based on quantity
+  const totalValue = currentPrice && asset.quantity ? currentPrice * asset.quantity : 0;
 
   const handleBack = () => {
     navigate('/');
   };
 
-  const renderPrice = () => {
-    if (!currentPrice || !priceChange) {
-      return null;
-    }
-    return (
-      <>
-        <div className="text-2xl font-semibold mb-10">${totalValue.toLocaleString()}</div>
-        <div className={`flex items-center gap-1 text-sm font-medium ${priceChangeColor}`}>
-          <span>{priceChange >= 0 ? '▲' : '▼'}</span>
-          <span>{`${priceChange.toFixed(2)} (${((priceChange / currentPrice) * 100).toFixed(2)}%)`}</span>
-        </div>
-      </>
-    );
-  };
-
   return (
-    <div className="bg-black rounded-lg shadow-lg p-6 w-[90%] max-w-4xl mx-auto text-white relative">
-      <h3 className="text-3xl font-bold mb-2 mt-6">{asset.symbol}</h3>
-      {renderPrice()}
+    <div className="bg-black rounded-lg shadow-lg p-4 md:p-6 w-[95%] md:w-[90%] max-w-4xl mx-auto text-white relative">
+      <div className="flex justify-between items-center m-3">
+        <h3 className="text-2xl md:text-3xl font-bold mb-2 ">{asset.symbol} </h3>
+        <div className="text-right">
+          <div className="text-xl md:text-2xl font-semibold">{formatCurrency(currentPrice || 0)}</div>
+          {asset.quantity > 0 && (
+            <div className="text-sm text-gray-400">
+              Total: {formatCurrency(totalValue)}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="mt-4">
         <PriceChart symbol={asset.symbol} />
       </div>
 
-      <Button secondary className="w-full mt-10" onClick={handleBack} >
+      {/* AssetStats now directly consumes useCoinData */}
+      <AssetStats symbol={asset.symbol} />
+
+      <Button secondary className="w-full mt-6 md:mt-10" onClick={handleBack}>
         Back to Home
       </Button>
     </div>

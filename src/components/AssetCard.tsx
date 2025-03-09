@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePriceStream } from '@store/usePriceStreamStore';
 import PriceBadge from '@components/PriceBadge';
+import { formatCurrency } from '../utils/formatters';
 
 interface AssetCardProps {
   asset: {
@@ -38,7 +39,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
 
         <div className="flex justify-between items-end mt-4">
           <div>
-            <p className="text-2xl font-semibold">${totalValue.toLocaleString()}</p>
+            <p className="text-2xl font-semibold">{formatCurrency(totalValue)}</p>
           </div>
           <PriceBadge currentPrice={currentPrice} />
         </div>

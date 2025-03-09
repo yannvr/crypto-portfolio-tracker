@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { formatPercent } from "../utils/formatters";
 
 interface PriceBadgeProps {
   currentPrice: number | null;
@@ -13,7 +14,7 @@ export default function PriceBadge({ currentPrice }: PriceBadgeProps) {
     if (currentPrice !== null) {
       if (previousPrice !== null && currentPrice !== previousPrice) {
         setPriceChangeIndicator(currentPrice > previousPrice ? '▲' : '▼');
-        setPriceChangeValue(((currentPrice - previousPrice) / previousPrice) * 100);
+        setPriceChangeValue((currentPrice - previousPrice) / previousPrice);
       }
       setPreviousPrice(currentPrice);
     }
@@ -27,7 +28,7 @@ export default function PriceBadge({ currentPrice }: PriceBadgeProps) {
 
   return (
     <div className={`font-semibold text-sm flex items-center ${priceChangeColor}`}>
-      {priceChangeIndicator} {priceChangeValue?.toFixed(2)}%
+      {priceChangeIndicator} {formatPercent(priceChangeValue, 2)}
     </div>
   );
 }

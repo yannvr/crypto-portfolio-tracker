@@ -1,39 +1,35 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
-interface PriceData {
-  date: string;
-  price: number;
-}
+import { usePriceChart } from '../hooks/usePriceChart';
 
 interface PriceChartProps {
   symbol: string;
 }
 
 export default function PriceChart({ symbol }: PriceChartProps) {
-  const [data, setData] = useState<PriceData[]>([]);
+  const { chartData, isLoading, isError } = usePriceChart(symbol);
 
-  useEffect(() => {
-    const fetchPriceData = async () => {
-      try {
-        const response = await fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}USDT&interval=1d&limit=7`);
-        const result = await response.json();
-        const formattedData = result.map((item: any) => ({
-          date: new Date(item[0]).toLocaleDateString('en-GB', { month: '2-digit', day: 'numeric' }), // Shortened date format
-          price: parseFloat(item[4]), // Closing price
-        }));
-        setData(formattedData);
-      } catch (error) {
-        console.error(`Error fetching price data for ${symbol}:`, error);
-      }
-    };
+  if (isLoading) {
+    return (
+      <div className="h-[250px] w-full flex items-center justify-center bg-black">
+        <div className="animate-pulse text-gray-400">Loading chart data...</div>
+      </div>
+    );
+  }
 
-    fetchPriceData();
-  }, [symbol]);
+  if (isError || chartData.length === 0) {
+    return (
+      <div className="h-[250px] w-full flex items-center justify-center bg-black">
+        <div className="text-gray-400">
+          {isError ? 'Error loading chart data' : 'No chart data available'}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <ResponsiveContainer width="100%" height={250}>
-      <LineChart data={data} className="bg-black">
+      <LineChart data={chartData} className="bg-black">
         <XAxis dataKey="date" tick={{ fill: '#bbb' }} />
         <YAxis tick={{ fill: '#bbb' }} tickFormatter={(value) => `$${value.toFixed(2)}`} />
         <Tooltip
