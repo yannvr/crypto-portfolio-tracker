@@ -6,6 +6,7 @@ interface SelectProps {
   children: React.ReactNode;
 }
 
+// This uses the native select element for maximum accessibility
 const Select: React.FC<SelectProps> = ({ value, onChange, children }) => {
   return (
     <select
