@@ -9,6 +9,10 @@ export const API_URLS = {
   BINANCE_WS_BASE_URL: 'wss://stream.binance.com:443/ws',
 };
 
+// CoinGecko API key for demo purposes to work around rate limiter
+// In production, the key should be stored in a secure environment variable
+export const COINGECKO_API_KEY = 'CG-9xwxyVqTa5PXhW73cwWY2Yco';
+
 export const ENDPOINTS = {
   COINGECKO: {
     // Get a list of all available coins
@@ -47,6 +51,12 @@ export const ENDPOINTS = {
 };
 
 export const fetcher = async (url: string) => {
+  // This is a workaround to passing the API key in the url as it doesn't work in headers
+  if (url.includes(API_URLS.COINGECKO_BASE_URL)) {
+    // Check if the URL already has query parameters
+    const separator = url.includes('?') ? '&' : '?';
+    url = `${url}${separator}x_cg_demo_api_key=${COINGECKO_API_KEY}`;
+  }
   const response = await fetch(url);
 
   if (!response.ok) {
