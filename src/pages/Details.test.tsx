@@ -131,7 +131,7 @@ describe('Details Page', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument();
+    expect(screen.getByText('Loading asset data...')).toBeInTheDocument();
   });
 
   test('renders error state', () => {

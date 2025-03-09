@@ -10,7 +10,159 @@ import { formatCurrency } from '../utils/utils';
 
 type SortOption = 'name' | 'value';
 
-export default function Home() {
+interface Asset {
+  id: number;
+  symbol: string;
+  quantity: number;
+}
+
+interface PortfolioHeaderProps {
+  assetCount: number;
+  totalValue: number;
+}
+
+interface FilterControlsProps {
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+  sortOption: SortOption;
+  setSortOption: (value: SortOption) => void;
+}
+
+interface AssetGridProps {
+  assets: Asset[];
+}
+
+// ===== Components =====
+
+/**
+ * Displays the portfolio header with summary information and add button
+ */
+const PortfolioHeader: React.FC<PortfolioHeaderProps> = ({ assetCount, totalValue }) => (
+  <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+      <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
+      <p className="text-gray-400 mt-1">
+        {assetCount} {assetCount === 1 ? 'Asset' : 'Assets'} • Total Value: {formatCurrency(totalValue)}
+      </p>
+    </div>
+    <Link to="/add">
+      <Button>+ Asset</Button>
+    </Link>
+  </header>
+);
+
+/**
+ * Provides search and sort controls for the portfolio
+ */
+const FilterControls: React.FC<FilterControlsProps> = ({
+  searchTerm,
+  setSearchTerm,
+  sortOption,
+  setSortOption
+}) => (
+  <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
+    <TextInput
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      placeholder="Search asset..."
+      aria-label="Search assets"
+    />
+
+    <Select
+      value={sortOption}
+      onChange={(e) => setSortOption(e.target.value as SortOption)}
+      aria-label="Sort assets"
+    >
+      <option value="name">Sort by Name</option>
+      <option value="value">Sort by Value</option>
+    </Select>
+  </div>
+);
+
+/**
+ * Displays a message when the portfolio is empty
+ */
+const EmptyPortfolio: React.FC = () => (
+  <div className="col-span-full text-center text-gray-400 py-12 bg-gray-900 rounded-lg">
+    <p className="text-xl mb-4">Your portfolio is empty</p>
+    <p className="mb-6">Add your first asset to start tracking your crypto investments</p>
+    <Link to="/add">
+      <Button>Add Your First Asset</Button>
+    </Link>
+  </div>
+);
+
+/**
+ * Renders a grid of asset cards or empty state
+ */
+const AssetGrid: React.FC<AssetGridProps> = ({ assets }) => (
+  <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    {assets.length > 0 ? (
+      assets.map((asset) => (
+        <AssetCard key={asset.id} asset={asset} />
+      ))
+    ) : (
+      <EmptyPortfolio />
+    )}
+  </main>
+);
+
+// ===== Custom Hooks =====
+
+/**
+ * Hook to filter and sort assets based on search term and sort option
+ * @returns Filtered and sorted array of assets
+ */
+const useFilteredAndSortedAssets = (
+  assets: Asset[],
+  prices: Record<string, number | null>,
+  sortOption: SortOption,
+  searchTerm: string
+): Asset[] => {
+  return useMemo(() => {
+    // First filter assets by search term
+    const filtered = assets.filter(asset =>
+      asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Then sort the filtered assets
+    return filtered.sort((a, b) => {
+      if (sortOption === 'name') {
+        return a.symbol.localeCompare(b.symbol);
+      }
+
+      if (sortOption === 'value') {
+        const valueA = (prices[a.symbol] || 0) * a.quantity;
+        const valueB = (prices[b.symbol] || 0) * b.quantity;
+        return valueB - valueA; // Descending order for values
+      }
+
+      return 0;
+    });
+  }, [assets, prices, sortOption, searchTerm]);
+};
+
+/**
+ * Hook to calculate the total value of all assets in the portfolio
+ * @returns Total portfolio value in USD
+ */
+const useTotalPortfolioValue = (
+  assets: Array<{ symbol: string; quantity: number }>,
+  prices: Record<string, number | null>
+): number => {
+  return useMemo(() => {
+    return assets.reduce((total, asset) => {
+      const price = prices[asset.symbol] || 0;
+      return total + (price * asset.quantity);
+    }, 0);
+  }, [assets, prices]);
+};
+
+/**
+ * Main Home component that displays the portfolio dashboard
+ */
+export default function Home(): React.ReactElement {
+  // State and store hooks
   const { assets } = usePortfolioStore();
   const { prices } = usePriceStore();
   const [sortOption, setSortOption] = useState<SortOption>('name');
@@ -19,76 +171,30 @@ export default function Home() {
   // Initialize price streams for all assets
   usePortfolioPriceStreams(assets);
 
-  // Calculate total portfolio value
-  const totalPortfolioValue = useMemo(() => {
-    return assets.reduce((total, asset) => {
-      const price = prices[asset.symbol] || 0;
-      return total + (price * asset.quantity);
-    }, 0);
-  }, [assets, prices]);
-
-  const filteredAndSortedAssets = useMemo(() => {
-    const filtered = assets.filter(asset =>
-      asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    return filtered.sort((a, b) => {
-      if (sortOption === 'name') {
-        return a.symbol.localeCompare(b.symbol);
-      } else if (sortOption === 'value') {
-        const valueA = (prices[a.symbol] || 0) * a.quantity;
-        const valueB = (prices[b.symbol] || 0) * b.quantity;
-        return valueB - valueA;
-      }
-      return 0;
-    });
-  }, [assets, prices, sortOption, searchTerm]);
+  // Derived state using custom hooks
+  const totalPortfolioValue = useTotalPortfolioValue(assets, prices);
+  const filteredAndSortedAssets = useFilteredAndSortedAssets(
+    assets,
+    prices,
+    sortOption,
+    searchTerm
+  );
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-8">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <h1 className="text-4xl font-bold text-white">Crypto Portfolio</h1>
-          <p className="text-gray-400 mt-1">
-            {assets.length} {assets.length === 1 ? 'Asset' : 'Assets'} • Total Value: {formatCurrency(totalPortfolioValue)}
-          </p>
-        </div>
-        <Link to="/add">
-          <Button>+ Asset</Button>
-        </Link>
-      </header>
+      <PortfolioHeader
+        assetCount={assets.length}
+        totalValue={totalPortfolioValue}
+      />
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-        <TextInput
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search asset..."
-        />
+      <FilterControls
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        sortOption={sortOption}
+        setSortOption={setSortOption}
+      />
 
-        <Select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value as SortOption)}
-        >
-          <option value="name">Sort by Name</option>
-          <option value="value">Sort by Value</option>
-        </Select>
-      </div>
-
-      <main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredAndSortedAssets.length > 0 ? (
-          filteredAndSortedAssets.map((asset) => (
-            <AssetCard key={asset.id} asset={asset} />
-          ))
-        ) : (
-          <div className="col-span-full text-center text-gray-400 py-12 bg-gray-900 rounded-lg">
-            <p className="text-xl mb-4">Your portfolio is empty</p>
-            <p className="mb-6">Add your first asset to start tracking your crypto investments</p>
-            <Link to="/add">
-              <Button>Add Your First Asset</Button>
-            </Link>
-          </div>
-        )}
-      </main>
+      <AssetGrid assets={filteredAndSortedAssets} />
     </div>
   );
 }
