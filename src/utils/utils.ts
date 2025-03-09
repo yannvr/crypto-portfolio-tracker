@@ -43,12 +43,12 @@ export function formatPercent(value: number, digits = 2): string {
  * @returns Formatted price change string
  */
 export function formatPriceChange(change: number, price: number): string {
-  const sign = change >= 0 ? '+' : '';
-  const percentChange = `${sign}${change.toFixed(2)}%`;
+  const sign = change >= 0 ? '+' : '-';
+  const percentChange = `${sign}${Math.abs(change).toFixed(2)}%`;
 
   // Calculate the absolute value change
-  const valueChange = (price * change) / 100;
-  const formattedValueChange = formatCurrency(Math.abs(valueChange));
+  const valueChange = (price * Math.abs(change)) / 100;
+  const formattedValueChange = formatCurrency(valueChange);
 
   return `${percentChange} (${sign}${formattedValueChange})`;
 }
@@ -69,7 +69,7 @@ export function generateId(): string {
  */
 export function truncateString(str: string, maxLength: number): string {
   if (str.length <= maxLength) return str;
-  return `${str.substring(0, maxLength)}...`;
+  return `${str.substring(0, maxLength - 3)}...`;
 }
 
 /**
@@ -82,7 +82,7 @@ export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null;
+  let timeout: ReturnType<typeof setTimeout> | null = null;
 
   return function(...args: Parameters<T>): void {
     const later = () => {

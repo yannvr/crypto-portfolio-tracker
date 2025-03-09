@@ -12,8 +12,9 @@
     "paths": {
       "@components/*": ["components/*"],
       "@store/*": ["store/*"],
-    }
+    },
+    "types": ["jest", "@testing-library/jest-dom"]
   },
-  "include": ["src"],
+  "include": ["src", "setupTests.ts"],
   "exclude": ["node_modules", "dist"]
 }
