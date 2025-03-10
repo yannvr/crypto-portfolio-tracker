@@ -1,10 +1,9 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import usePriceStore from '../../../store/usePriceStore';
+import usePriceStore from '@store/usePriceStore';
 import { formatCurrency } from '../../../utils/utils';
 import PriceBadge from './PriceBadge';
 import Button from '@components/Button';
-import { Asset } from '@store/usePortfolioStore';
+import { Asset } from '../../Home';
 
 interface AssetCardProps {
   asset: Asset;

@@ -1,10 +1,9 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { useCoinList } from './hooks/useAssetData';
 import AddEditHolding from './pages/AddEditHolding';
 import Details from './pages/Details';
+import Home from './pages/Home';
 import PageNotFound from './pages/PageNotFound';
-import { useCoinList } from './hooks/useAssetData';
 
 export default function App() {
   // Pre-initialize the coin list so it's available throughout the app

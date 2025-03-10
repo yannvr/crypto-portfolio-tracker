@@ -1,5 +1,3 @@
-import React from 'react';
-
 export interface StatItemProps {
   label: string;
   value: string | number;

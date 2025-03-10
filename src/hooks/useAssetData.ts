@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 import { API_URLS, ENDPOINTS, fetcher } from '../services/apiService';
-import usePriceStore from '../store/usePriceStore';
+import usePriceStore from '@store/usePriceStore';
 
 // ===== Types =====
 

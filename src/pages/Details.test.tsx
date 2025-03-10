@@ -1,12 +1,11 @@
-import React from 'react';
+import usePortfolioStore from '@store/usePortfolioStore';
 import { render, screen } from '@testing-library/react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Details from './Details';
-import usePortfolioStore from '../store/usePortfolioStore';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useCoinData, usePriceChart } from '../hooks/useAssetData';
+import Details from './Details';
 
 // Mock the stores and hooks
-jest.mock('../store/usePortfolioStore', () => ({
+jest.mock('@store/usePortfolioStore', () => ({
   __esModule: true,
   default: jest.fn()
 }));

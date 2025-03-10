@@ -1,4 +1,4 @@
-import usePriceStore from '../store/usePriceStore';
+import usePriceStore from '@store/usePriceStore';
 
 // Reset the store before each test
 beforeEach(() => {

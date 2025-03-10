@@ -1,6 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import Button from '../../../components/Button';
+import Button from '@components/Button';
 
 export const ErrorState: React.FC<{ message?: string }> = ({
   message = "Error loading data. Please try again later."

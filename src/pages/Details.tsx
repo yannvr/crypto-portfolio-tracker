@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import Button from '@components/Button';
+import usePortfolioStore from '@store/usePortfolioStore';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Button from '../components/Button';
-import usePortfolioStore from '../store/usePortfolioStore';
 import { AssetInfoCard } from './Details/components/AssetInfoCard';
 import { MarketStatsCard } from './Details/components/MarketStatsCard';
 import { PriceChartCard } from './Details/components/PriceChartCard';
@@ -19,9 +19,6 @@ export default function Details() {
   }
 
   // Simple function to handle days change
-  const handleDaysChange = (days: number) => {
-    setSelectedDays(days);
-  };
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-8">
@@ -40,24 +37,20 @@ export default function Details() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* First row with fixed height */}
         <div className="lg:col-span-3 lg:flex lg:flex-col lg:h-[400px]">
-          <AssetInfoCard
-            asset={asset}
-          />
+          <AssetInfoCard asset={asset} />
         </div>
 
         <div className="lg:col-span-9 lg:flex lg:flex-col lg:h-[400px]">
           <PriceChartCard
             asset={asset}
             selectedDays={selectedDays}
-            setSelectedDays={handleDaysChange}
+            setSelectedDays={(days: number) => { setSelectedDays(days) }}
           />
         </div>
 
         {/* Second row - Market Stats only */}
         <div className="lg:col-span-12">
-          <MarketStatsCard
-            symbol={asset.symbol}
-          />
+          <MarketStatsCard symbol={asset.symbol} />
         </div>
       </div>
     </div>

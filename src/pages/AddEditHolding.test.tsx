@@ -1,11 +1,10 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import usePortfolioStore from '@store/usePortfolioStore';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import AddEditHolding from './AddEditHolding';
-import usePortfolioStore from '../store/usePortfolioStore';
 
 // Mock the store
-jest.mock('../store/usePortfolioStore', () => ({
+jest.mock('@store/usePortfolioStore', () => ({
   __esModule: true,
   default: jest.fn()
 }));

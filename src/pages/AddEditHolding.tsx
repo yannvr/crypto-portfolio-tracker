@@ -1,11 +1,11 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Button from '../components/Button';
-import ErrorMessage from '../components/ErrorMessage';
-import NumberInput from '../components/NumberInput';
-import TextInput from '../components/TextInput';
+import Button from '@components/Button';
+import ErrorMessage from '@components/ErrorMessage';
+import NumberInput from '@components/NumberInput';
+import TextInput from '@components/TextInput';
 import { useCoinList } from '../hooks/useAssetData';
-import usePortfolioStore from '../store/usePortfolioStore';
+import usePortfolioStore from '@store/usePortfolioStore';
 
 // Types
 interface FormState {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatCurrency } from '../../../utils/utils';
 import { useCoinData } from '../../../hooks/useAssetData';
 import { StatItem, LoadingStatItem } from './StatItem';

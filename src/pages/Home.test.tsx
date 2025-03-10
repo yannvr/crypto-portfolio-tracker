@@ -1,18 +1,17 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Home from './Home';
-import usePortfolioStore from '../store/usePortfolioStore';
-import usePriceStore from '../store/usePriceStore';
+import usePortfolioStore from '@store/usePortfolioStore';
+import usePriceStore from '@store/usePriceStore';
 import { usePriceStream } from '../hooks/useAssetData';
 
 // Mock the stores and hooks
-jest.mock('../store/usePortfolioStore', () => ({
+jest.mock('@store/usePortfolioStore', () => ({
   __esModule: true,
   default: jest.fn()
 }));
 
-jest.mock('../store/usePriceStore', () => ({
+jest.mock('@store/usePriceStore', () => ({
   __esModule: true,
   default: jest.fn()
 }));
