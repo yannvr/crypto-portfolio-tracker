@@ -2,16 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../../../components/Button';
 
-export const LoadingState: React.FC = () => (
-  <div className="text-center py-12">
-    <div className="animate-pulse">
-      <div className="h-8 w-48 bg-gray-700 rounded mx-auto mb-4"></div>
-      <div className="h-4 w-64 bg-gray-700 rounded mx-auto"></div>
-    </div>
-    <p className="mt-4 text-gray-400">Loading asset data...</p>
-  </div>
-);
-
 export const ErrorState: React.FC<{ message?: string }> = ({
   message = "Error loading data. Please try again later."
 }) => (

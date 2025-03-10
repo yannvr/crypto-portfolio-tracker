@@ -1,11 +1,6 @@
+import { Asset } from 'pages/Home';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-export interface Asset {
-  id: number;
-  symbol: string;
-  quantity: number;
-}
 
 interface PortfolioState {
   assets: Asset[];
@@ -15,7 +10,7 @@ interface PortfolioState {
   removeAsset: (id: number) => void;
   editAsset: (id: number, updates: Partial<Omit<Asset, 'id'>>) => void;
   selectAsset: (id?: string) => Asset | undefined;
-  // Computed values
+  // Virtual values
   getTotalAssets: () => number;
 }
 
@@ -50,7 +45,7 @@ const usePortfolioStore = create<PortfolioState>()(
       getTotalAssets: () => get().assets.length,
     }),
     {
-      name: 'portfolio-storage', // name of the item in the storage (must be unique)
+      name: 'portfolio-storage',
     },
   ),
 );

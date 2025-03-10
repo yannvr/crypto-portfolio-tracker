@@ -1,12 +1,11 @@
-import { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Button from '../components/Button';
-import { useInitialPrices } from '../hooks/useAssetData';
 import usePortfolioStore from '../store/usePortfolioStore';
 import { AssetInfoCard } from './Details/components/AssetInfoCard';
-import { AssetNotFound } from './Details/components/StateComponents';
-import { PriceChartCard } from './Details/components/PriceChartCard';
 import { MarketStatsCard } from './Details/components/MarketStatsCard';
+import { PriceChartCard } from './Details/components/PriceChartCard';
+import { AssetNotFound } from './Details/components/StateComponents';
 
 export default function Details() {
   const { id } = useParams();

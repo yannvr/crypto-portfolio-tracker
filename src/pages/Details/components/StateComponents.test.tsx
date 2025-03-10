@@ -1,18 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { LoadingState, ErrorState, AssetNotFound } from './StateComponents';
-
-describe('LoadingState', () => {
-  test('renders loading message', () => {
-    render(<LoadingState />);
-    expect(screen.getByText('Loading asset data...')).toBeInTheDocument();
-  });
-
-  test('renders loading skeleton', () => {
-    render(<LoadingState />);
-    expect(document.querySelector('.animate-pulse')).toBeInTheDocument();
-  });
-});
+import { ErrorState, AssetNotFound } from './StateComponents';
 
 describe('ErrorState', () => {
   test('renders default error message', () => {
@@ -37,7 +25,7 @@ describe('AssetNotFound', () => {
     render(
       <BrowserRouter>
         <AssetNotFound />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
     expect(screen.getByText('Asset not found')).toBeInTheDocument();
   });
@@ -46,7 +34,7 @@ describe('AssetNotFound', () => {
     render(
       <BrowserRouter>
         <AssetNotFound />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
     expect(screen.getByText('Back to Portfolio')).toBeInTheDocument();
   });

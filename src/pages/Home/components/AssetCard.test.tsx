@@ -1,16 +1,15 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import AssetCard from './AssetCard';
-import { usePriceStore } from '../../../hooks/useAssetData';
 
 // Mock the usePriceStore
-jest.mock('../../../hooks/useAssetData', () => ({
-  usePriceStore: jest.fn().mockImplementation((selector) => {
+jest.mock('../../../store/usePriceStore', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation((selector) => {
     const state = {
       prices: { BTC: 50000 },
       priceChanges: { BTC: 5.25 },
-      connectionStatus: { BTC: 'connected' }
+      connectionStatus: { BTC: "connected" }
     };
     return selector ? selector(state) : state;
   })

@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
-import { create } from 'zustand';
 import { API_URLS, ENDPOINTS, fetcher } from '../services/apiService';
+import usePriceStore from '../store/usePriceStore';
 
 // ===== Types =====
 
@@ -49,58 +49,6 @@ export const CACHED_SWR_CONFIG = {
   dedupingInterval: 24 * 60 * 60 * 1000, // 24 hours
   revalidateIfStale: false,
 };
-
-// ===== Price Stream Store =====
-
-interface PriceState {
-  prices: Record<string, number | null>;
-  previousPrices: Record<string, number | null>;
-  priceChanges: Record<string, number>;
-  lastUpdated: Record<string, number>;
-  connectionStatus: Record<string, 'connected' | 'disconnected' | 'error'>;
-
-  setPrice: (symbol: string, price: number) => void;
-  setConnectionStatus: (symbol: string, status: 'connected' | 'disconnected' | 'error') => void;
-  clearPrices: () => void;
-}
-
-// Store for managing real-time price data
-export const usePriceStore = create<PriceState>()((set) => ({
-  prices: {},
-  previousPrices: {},
-  priceChanges: {},
-  lastUpdated: {},
-  connectionStatus: {},
-
-  setPrice: (symbol, price) =>
-    set((state) => {
-      const previousPrice = state.prices[symbol];
-
-      let priceChange = state.priceChanges[symbol] || 0;
-      if (previousPrice && previousPrice > 0) {
-        priceChange = ((price - previousPrice) / previousPrice) * 100;
-      }
-
-      return {
-        prices: { ...state.prices, [symbol]: price },
-        previousPrices: { ...state.previousPrices, [symbol]: previousPrice },
-        priceChanges: { ...state.priceChanges, [symbol]: priceChange },
-        lastUpdated: { ...state.lastUpdated, [symbol]: Date.now() },
-      };
-    }),
-
-  setConnectionStatus: (symbol, status) =>
-    set((state) => ({
-      connectionStatus: { ...state.connectionStatus, [symbol]: status },
-    })),
-
-  clearPrices: () => set({
-    prices: {},
-    previousPrices: {},
-    priceChanges: {},
-    lastUpdated: {}
-  }),
-}));
 
 // ===== Canonical Coin IDs =====
 
@@ -275,13 +223,8 @@ export function usePriceStream(
   return typeof symbolsInput === 'string' ? prices[symbolsInput] || null : undefined;
 }
 
-// ===== API Functions =====
-
-/**
- * Fetch initial prices for multiple assets in a single API call
- * @param assets Array of assets with symbols
- * @param onSuccess Callback function to handle successful price fetch
- */
+ // Fetch initial prices for multiple assets in a single API call
+ // Used by home page to fetch prices for all assets in one go
 export async function fetchInitialPrices(
   assets: Array<{ symbol: string }>,
   onSuccess: (symbol: string, price: number) => void

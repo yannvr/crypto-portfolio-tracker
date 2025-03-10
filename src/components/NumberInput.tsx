@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface NumberInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;

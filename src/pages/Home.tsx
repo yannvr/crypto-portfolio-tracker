@@ -1,16 +1,17 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Button from '../components/Button';
 import Select from '../components/Select';
 import TextInput from '../components/TextInput';
-import { fetchInitialPrices, usePriceStore, usePriceStream } from '../hooks/useAssetData';
+import { fetchInitialPrices, usePriceStream } from '../hooks/useAssetData';
 import usePortfolioStore from '../store/usePortfolioStore';
+import usePriceStore from '../store/usePriceStore';
 import { formatCurrency } from '../utils/utils';
 import AssetCard from './Home/components/AssetCard';
 
 type SortOption = 'name' | 'value';
 
-interface Asset {
+export interface Asset {
   id: number;
   symbol: string;
   quantity: number;

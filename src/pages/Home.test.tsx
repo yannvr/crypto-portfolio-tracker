@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Home from './Home';
 import usePortfolioStore from '../store/usePortfolioStore';
-import { usePriceStore, usePriceStream } from '../hooks/useAssetData';
+import usePriceStore from '../store/usePriceStore';
+import { usePriceStream } from '../hooks/useAssetData';
 
 // Mock the stores and hooks
 jest.mock('../store/usePortfolioStore', () => ({
@@ -11,10 +12,14 @@ jest.mock('../store/usePortfolioStore', () => ({
   default: jest.fn()
 }));
 
+jest.mock('../store/usePriceStore', () => ({
+  __esModule: true,
+  default: jest.fn()
+}));
+
 jest.mock('../hooks/useAssetData', () => ({
-  usePriceStore: jest.fn(),
   usePriceStream: jest.fn(),
-  useInitialPrices: jest.fn()
+  fetchInitialPrices: jest.fn()
 }));
 
 describe('Home Page', () => {

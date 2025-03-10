@@ -1,4 +1,4 @@
-import { usePriceStore } from './useAssetData';
+import usePriceStore from '../store/usePriceStore';
 
 // Reset the store before each test
 beforeEach(() => {
@@ -45,21 +45,5 @@ describe('usePriceStore', () => {
     // Get the updated state after the action
     const updatedState = usePriceStore.getState();
     expect(updatedState.connectionStatus.BTC).toBe('connected');
-  });
-
-  test('should clear prices', () => {
-    const { setPrice, clearPrices } = usePriceStore.getState();
-
-    setPrice('BTC', 50000);
-
-    // Get the updated state after setting price
-    const stateAfterSet = usePriceStore.getState();
-    expect(stateAfterSet.prices.BTC).toBe(50000);
-
-    clearPrices();
-
-    // Get the updated state after clearing
-    const stateAfterClear = usePriceStore.getState();
-    expect(Object.keys(stateAfterClear.prices).length).toBe(0);
   });
 });

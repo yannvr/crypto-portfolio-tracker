@@ -1,4 +1,3 @@
-import React from 'react';
 import { useCoinData } from '../hooks/useAssetData';
 import { formatCurrency, formatPercent } from '../utils/utils';
 

@@ -1,16 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import usePriceStore from '../../../store/usePriceStore';
 import { formatCurrency } from '../../../utils/utils';
-import { usePriceStore } from '../../../hooks/useAssetData';
 import PriceBadge from './PriceBadge';
 import Button from '@components/Button';
+import { Asset } from '@store/usePortfolioStore';
 
 interface AssetCardProps {
-  asset: {
-    id: number;
-    symbol: string;
-    quantity: number;
-  };
+  asset: Asset;
 }
 
 const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
