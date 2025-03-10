@@ -303,5 +303,6 @@ export function useInitialPrices(assets: Array<{ symbol: string }>) {
         console.error(`Error fetching initial price for ${symbol}:`, error);
       }
     });
-  }, [assets, findCoinIdBySymbol, setPrice]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once on mount
 }
