@@ -9,7 +9,7 @@
 
 The solution is meant to be as simple as possible. Therefore, Zustand has been chosen for state management although Redux would be better for scaling.
 In addition:
-- a real time price change notification has been added to help tracking the price. 
+- A real time price change notification has been added to help tracking the price. 
 Notes on external API:
 - SWR is used to minimise network request through caching and streamline fetching.
 - Binance provide the web socket stream for real time updates via miniTicker and Kline for historical price (via Rest).
