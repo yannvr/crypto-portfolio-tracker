@@ -33,7 +33,7 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
       </div>
 
       <div className="flex justify-between items-center">
-        <p className="text-gray-400">Quantity: {asset.quantity}</p>
+        <p className="text-gray-400">Quantity: {asset.quantity.toLocaleString()}</p>
         <p className="text-lg font-medium">
           {formatCurrency(totalValue)}
         </p>

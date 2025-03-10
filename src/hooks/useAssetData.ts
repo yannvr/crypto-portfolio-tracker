@@ -180,34 +180,31 @@ export function usePriceStream(
       const wsUrl = `${API_URLS.BINANCE_WS_BASE_URL}/${ENDPOINTS.BINANCE_WS.MINI_TICKER(symbol)}`;
       const ws = new WebSocket(wsUrl);
 
-      // For multiple symbols mode, we need to get the store methods directly
-      // since we're inside a map function and can't use the destructured values
-      const storeActions = typeof symbolsInput === 'string'
-        ? { setPrice, setConnectionStatus }
-        : usePriceStore.getState();
+      // Get the store methods directly to avoid closure issues
+      const { setPrice, setConnectionStatus } = usePriceStore.getState();
 
       ws.onopen = () => {
-        storeActions.setConnectionStatus(symbol, 'connected');
+        setConnectionStatus(symbol, 'connected');
       };
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          storeActions.setPrice(symbol, parseFloat(data.c));
+          setPrice(symbol, parseFloat(data.c));
         } catch (error) {
           console.error(`Error parsing WebSocket data for ${symbol}:`, error);
         }
       };
 
       ws.onerror = () => {
-        storeActions.setConnectionStatus(symbol, 'error');
+        setConnectionStatus(symbol, 'error');
         if (typeof symbolsInput === 'string') {
           onError?.(`WebSocket error for ${symbol}`);
         }
       };
 
       ws.onclose = () => {
-        storeActions.setConnectionStatus(symbol, 'disconnected');
+        setConnectionStatus(symbol, 'disconnected');
       };
 
       return ws;
@@ -217,14 +214,14 @@ export function usePriceStream(
     return () => {
       connections.forEach(ws => ws.close());
     };
-  }, [symbolsInput, onError, setPrice, setConnectionStatus]);
+  }, [symbolsInput, onError]);  // Removed setPrice and setConnectionStatus from dependencies
 
   // Only return the price in single symbol mode
   return typeof symbolsInput === 'string' ? prices[symbolsInput] || null : undefined;
 }
 
- // Fetch initial prices for multiple assets in a single API call
- // Used by home page to fetch prices for all assets in one go
+// Fetch initial prices for multiple assets in a single API call
+// Used by home page to fetch prices for all assets in one go
 export async function fetchInitialPrices(
   assets: Array<{ symbol: string }>,
   onSuccess: (symbol: string, price: number) => void
@@ -249,36 +246,43 @@ export async function fetchInitialPrices(
 
       // Find in the list
       const coin = coinList.find((c: Coin) => c.symbol.toLowerCase() === normalizedSymbol);
-      return coin?.id;
-    }).filter(Boolean); // Remove any undefined/null values
+      return coin?.id || normalizedSymbol;
+    }).filter(Boolean);
 
-    if (coinIds.length === 0) return;
+    // Batch fetch prices for all coins
+    if (coinIds.length > 0) {
+      try {
+        const idsParam = coinIds.join(',');
+        const pricesUrl = `${API_URLS.COINGECKO_BASE_URL}/simple/price?ids=${idsParam}&vs_currencies=usd`;
+        const pricesData = await fetcher(pricesUrl);
 
-    // Build a comma-separated list of coin IDs
-    const idsParam = coinIds.join(',');
-
-    // Fetch prices for all coins in a single call
-    const pricesUrl = `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.SIMPLE_PRICE(idsParam)}`;
-    const priceData = await fetcher(pricesUrl);
-
-    // Process the results and call the success handler for each symbol
-    symbols.forEach(symbol => {
-      const normalizedSymbol = symbol.toLowerCase();
-      let coinId;
-
-      // Find the coin ID again (we need to map back from ID to symbol)
-      if (CANONICAL_COIN_IDS[normalizedSymbol]) {
-        coinId = CANONICAL_COIN_IDS[normalizedSymbol];
-      } else {
-        const coin = coinList.find((c: Coin) => c.symbol.toLowerCase() === normalizedSymbol);
-        coinId = coin?.id;
+        // Update prices in the store
+        symbols.forEach((symbol, index) => {
+          const coinId = coinIds[index];
+          if (coinId && pricesData[coinId]?.usd) {
+            onSuccess(symbol, pricesData[coinId].usd);
+          }
+        });
+      } catch (priceError) {
+        console.error('Error fetching batch prices:', priceError);
+        // Fall back to individual price fetches if batch fails
+        symbols.forEach(async (symbol, index) => {
+          try {
+            const coinId = coinIds[index];
+            if (coinId) {
+              const singlePriceUrl = `${API_URLS.COINGECKO_BASE_URL}/simple/price?ids=${coinId}&vs_currencies=usd`;
+              const singlePriceData = await fetcher(singlePriceUrl);
+              if (singlePriceData[coinId]?.usd) {
+                onSuccess(symbol, singlePriceData[coinId].usd);
+              }
+            }
+          } catch (singleError) {
+            console.error(`Error fetching price for ${symbol}:`, singleError);
+          }
+        });
       }
-
-      if (coinId && priceData[coinId] && priceData[coinId].usd) {
-        onSuccess(symbol, priceData[coinId].usd);
-      }
-    });
+    }
   } catch (error) {
-    console.error('Error fetching initial prices:', error);
+    console.error('Error in fetchInitialPrices:', error);
   }
 }

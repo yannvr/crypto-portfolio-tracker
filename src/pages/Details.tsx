@@ -18,8 +18,6 @@ export default function Details() {
     return <AssetNotFound />;
   }
 
-  // Simple function to handle days change
-
   return (
     <div className="min-h-screen bg-black text-white px-6 py-8">
       <header className="flex justify-between items-center mb-8">

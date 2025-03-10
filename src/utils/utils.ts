@@ -1,4 +1,7 @@
-export const formatCurrency = (value: number): string => {
+export const formatCurrency = (value: number | null | undefined): string => {
+  // Handle invalid values
+  if (value === null || value === undefined || isNaN(value)) return '$0.00';
+
   // Handle zero or very small values
   if (value === 0) return '$0.00';
   if (value < 0.01) return '<$0.01';

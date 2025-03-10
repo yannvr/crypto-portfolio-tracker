@@ -93,7 +93,9 @@ const AssetGrid: React.FC<AssetGridProps> = ({ assets }) => (
         <AssetCard key={asset.id} asset={asset} />
       ))
     ) : (
-      <EmptyPortfolio />
+      <div className="col-span-full">
+        <EmptyPortfolio />
+      </div>
     )}
   </main>
 );
