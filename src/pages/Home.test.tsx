@@ -13,7 +13,8 @@ jest.mock('../store/usePortfolioStore', () => ({
 
 jest.mock('../hooks/useAssetData', () => ({
   usePriceStore: jest.fn(),
-  usePriceStream: jest.fn()
+  usePriceStream: jest.fn(),
+  useInitialPrices: jest.fn()
 }));
 
 describe('Home Page', () => {

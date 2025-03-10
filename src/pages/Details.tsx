@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import usePortfolioStore from '../store/usePortfolioStore';
-import { useInitialPrices } from '../hooks/useAssetData';
+import { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import Button from '../components/Button';
+import { useInitialPrices } from '../hooks/useAssetData';
+import usePortfolioStore from '../store/usePortfolioStore';
 import {
   AssetInfoCard,
-  PriceChartCard,
+  AssetNotFound,
   MarketStatsCard,
-  LoadingState,
-  ErrorState,
-  AssetNotFound
+  PriceChartCard
 } from './Details.components';
 
 export default function Details() {
@@ -21,7 +19,7 @@ export default function Details() {
   const asset = selectAsset(id);
 
   // Fetch initial price data if we have an asset
-  // useInitialPrices(asset ? [asset] : []);
+  useInitialPrices(asset ? [asset] : []);
 
   if (!asset) {
     return <AssetNotFound />;

@@ -23,10 +23,4 @@ describe('PriceBadge Component', () => {
     expect(changeElement).toBeInTheDocument();
     expect(changeElement.className).toContain('text-red-500');
   });
-
-  test('does not show change when showChange is false', () => {
-    render(<PriceBadge price={1000} priceChange={5.25} showChange={false} />);
-
-    expect(screen.queryByText('+5.25%')).not.toBeInTheDocument();
-  });
 });

@@ -157,7 +157,7 @@ export const PriceChartCard: React.FC<{
                 tickMargin={5}
               />
               <YAxis
-                tick={{ fill: '#999' }}
+                tick={{ fill: '#999', fontSize: 12 }}
                 axisLine={{ stroke: '#333' }}
                 domain={yAxisDomain}
                 tickFormatter={(value) => `$${value.toFixed(2)}`}

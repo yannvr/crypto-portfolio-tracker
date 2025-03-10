@@ -17,7 +17,8 @@ jest.mock('../hooks/useAssetData', () => ({
     loading: false,
     error: null,
     findCoinIdBySymbol: jest.fn().mockReturnValue('bitcoin') // Always return a valid coin ID
-  })
+  }),
+  useInitialPrices: jest.fn() // Mock useInitialPrices as a function
 }));
 
 // Mock the useNavigate hook

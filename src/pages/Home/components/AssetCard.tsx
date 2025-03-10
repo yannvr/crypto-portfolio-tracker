@@ -54,7 +54,6 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
           <PriceBadge
             price={currentPrice}
             priceChange={priceChange}
-            showChange={isConnected}
           />
         )}
       </div>

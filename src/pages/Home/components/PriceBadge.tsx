@@ -4,13 +4,11 @@ import { formatCurrency } from '../../../utils/utils';
 interface PriceBadgeProps {
   price: number;
   priceChange?: number;
-  showChange?: boolean;
 }
 
 const PriceBadge: React.FC<PriceBadgeProps> = ({
   price,
   priceChange = 0,
-  showChange = true
 }) => {
   // Determine color based on price change
   const getColorClass = () => {

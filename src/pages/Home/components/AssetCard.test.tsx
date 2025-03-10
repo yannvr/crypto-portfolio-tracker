@@ -6,20 +6,18 @@ import { usePriceStore } from '../../../hooks/useAssetData';
 
 // Mock the usePriceStore
 jest.mock('../../../hooks/useAssetData', () => ({
-  usePriceStore: jest.fn()
+  usePriceStore: jest.fn().mockImplementation((selector) => {
+    const state = {
+      prices: { BTC: 50000 },
+      priceChanges: { BTC: 5.25 },
+      connectionStatus: { BTC: 'connected' }
+    };
+    return selector ? selector(state) : state;
+  })
 }));
 
 describe('AssetCard Component', () => {
-  beforeEach(() => {
-    // Setup default mock implementation
-    ((usePriceStore as unknown) as jest.Mock).mockImplementation((selector) => {
-      const state = {
-        prices: { BTC: 50000 },
-        priceChanges: { BTC: 5.25 }
-      };
-      return selector ? selector(state) : state;
-    });
-  });
+  // No beforeEach needed as we've already mocked usePriceStore globally
 
   test('renders asset symbol', () => {
     render(
