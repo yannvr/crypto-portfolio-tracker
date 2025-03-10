@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import ErrorMessage from '../components/ErrorMessage';
 import NumberInput from '../components/NumberInput';
 import TextInput from '../components/TextInput';
-import { useCoinList, useInitialPrices } from '../hooks/useAssetData';
+import { useCoinList } from '../hooks/useAssetData';
 import usePortfolioStore from '../store/usePortfolioStore';
 
 // Types
@@ -29,8 +29,6 @@ export default function AddEditHolding() {
 
   const editingAsset = selectAsset(id);
 
-  // Fetch initial price if editing an asset
-  useInitialPrices(editingAsset ? [editingAsset] : []);
 
   // Load asset data when editing
   useEffect(() => {

@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import usePortfolioStore from '../store/usePortfolioStore';
-import { usePriceStore, usePriceStream, useInitialPrices } from '../hooks/useAssetData';
-import AssetCard from './Home/components/AssetCard';
-import TextInput from '../components/TextInput';
 import Button from '../components/Button';
 import Select from '../components/Select';
+import TextInput from '../components/TextInput';
+import { fetchInitialPrices, usePriceStore, usePriceStream } from '../hooks/useAssetData';
+import usePortfolioStore from '../store/usePortfolioStore';
 import { formatCurrency } from '../utils/utils';
+import AssetCard from './Home/components/AssetCard';
 
 type SortOption = 'name' | 'value';
 
@@ -145,12 +145,15 @@ const useTotalPortfolioValue = (
 export default function Home(): React.ReactElement {
   // State and store hooks
   const { assets } = usePortfolioStore();
-  const { prices } = usePriceStore();
+  const { prices, setPrice } = usePriceStore();
   const [sortOption, setSortOption] = useState<SortOption>('name');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch initial prices from REST API
-  useInitialPrices(assets);
+  // Fetch initial prices once on component mount
+  useEffect(() => {
+    fetchInitialPrices(assets, setPrice);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array to run only once on mount, ignoring assets and setPrice changes
 
   // Initialize price streams for all assets
   usePriceStream(assets);

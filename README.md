@@ -13,7 +13,7 @@ In addition:
 Notes on external API:
 - SWR is used to minimise network request through caching and streamline fetching.
 - Binance provide the web socket stream for real time updates via miniTicker and Kline for historical price (via Rest).
-- CoinGecko provides market data and inital asset price. 
+- CoinGecko provides market data and inital asset price. The only complexicty in the app lies in handling the resolution of prices via CoinGecko coin list and working around the rate limiter. However, this has been streamlined using `priceStore`.
 
 ## Features
 

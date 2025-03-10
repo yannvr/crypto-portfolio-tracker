@@ -214,7 +214,7 @@ export function usePriceChart(symbol: string, days = 7) {
   };
 }
 
-// Hook to initialize price streams for one or multiple assets
+// Hook to fetch and manage real-time price data via WebSocket
 export function usePriceStream(
   symbolsInput: string | Array<{ symbol: string }>,
   onError?: (message: string) => void
@@ -275,34 +275,67 @@ export function usePriceStream(
   return typeof symbolsInput === 'string' ? prices[symbolsInput] || null : undefined;
 }
 
-// Hook to fetch initial prices for multiple assets at once
-export function useInitialPrices(assets: Array<{ symbol: string }>) {
-  const { setPrice } = usePriceStore();
-  const { findCoinIdBySymbol } = useCoinList();
+// ===== API Functions =====
 
-  useEffect(() => {
-    if (!assets || assets.length === 0) return;
+/**
+ * Fetch initial prices for multiple assets in a single API call
+ * @param assets Array of assets with symbols
+ * @param onSuccess Callback function to handle successful price fetch
+ */
+export async function fetchInitialPrices(
+  assets: Array<{ symbol: string }>,
+  onSuccess: (symbol: string, price: number) => void
+) {
+  if (!assets || assets.length === 0) return;
 
-    // Get unique symbols
+  try {
+    // Get the coin list first
+    const coinListUrl = `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.COINS_LIST}`;
+    const coinList = await fetcher(coinListUrl);
+
+    // Get unique symbols and map them to coin IDs
     const symbols = [...new Set(assets.map(asset => asset.symbol))];
+    const coinIds = symbols.map(symbol => {
+      // Find the coin ID for this symbol
+      const normalizedSymbol = symbol.toLowerCase();
 
-    // For each symbol, find the coin ID and fetch the price
-    symbols.forEach(async (symbol) => {
-      const coinId = findCoinIdBySymbol(symbol);
-      if (!coinId) return;
+      // Check canonical IDs first
+      if (CANONICAL_COIN_IDS[normalizedSymbol]) {
+        return CANONICAL_COIN_IDS[normalizedSymbol];
+      }
 
-      try {
-        // Use the simple price endpoint for faster response
-        const url = `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.SIMPLE_PRICE(coinId)}`;
-        const data = await fetcher(url);
+      // Find in the list
+      const coin = coinList.find((c: Coin) => c.symbol.toLowerCase() === normalizedSymbol);
+      return coin?.id;
+    }).filter(Boolean); // Remove any undefined/null values
 
-        if (data && data[coinId] && data[coinId].usd) {
-          setPrice(symbol, data[coinId].usd);
-        }
-      } catch (error) {
-        console.error(`Error fetching initial price for ${symbol}:`, error);
+    if (coinIds.length === 0) return;
+
+    // Build a comma-separated list of coin IDs
+    const idsParam = coinIds.join(',');
+
+    // Fetch prices for all coins in a single call
+    const pricesUrl = `${API_URLS.COINGECKO_BASE_URL}${ENDPOINTS.COINGECKO.SIMPLE_PRICE(idsParam)}`;
+    const priceData = await fetcher(pricesUrl);
+
+    // Process the results and call the success handler for each symbol
+    symbols.forEach(symbol => {
+      const normalizedSymbol = symbol.toLowerCase();
+      let coinId;
+
+      // Find the coin ID again (we need to map back from ID to symbol)
+      if (CANONICAL_COIN_IDS[normalizedSymbol]) {
+        coinId = CANONICAL_COIN_IDS[normalizedSymbol];
+      } else {
+        const coin = coinList.find((c: Coin) => c.symbol.toLowerCase() === normalizedSymbol);
+        coinId = coin?.id;
+      }
+
+      if (coinId && priceData[coinId] && priceData[coinId].usd) {
+        onSuccess(symbol, priceData[coinId].usd);
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array to run only once on mount
+  } catch (error) {
+    console.error('Error fetching initial prices:', error);
+  }
 }

@@ -15,14 +15,6 @@ export default function Details() {
 
   const asset = selectAsset(id);
 
-  // Memoize the assets array to prevent unnecessary re-renders
-  const assetsForPrices = useMemo(() => {
-    return asset ? [asset] : [];
-  }, [asset?.id, asset?.symbol]);
-
-  // Fetch initial price data if we have an asset
-  useInitialPrices(assetsForPrices);
-
   if (!asset) {
     return <AssetNotFound />;
   }

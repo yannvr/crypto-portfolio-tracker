@@ -4,8 +4,12 @@ import Home from './pages/Home';
 import AddEditHolding from './pages/AddEditHolding';
 import Details from './pages/Details';
 import PageNotFound from './pages/PageNotFound';
+import { useCoinList } from './hooks/useAssetData';
 
 export default function App() {
+  // Pre-initialize the coin list so it's available throughout the app
+  useCoinList();
+
   return (
     <div className="min-h-screen bg-gray-900">
       <Router>

@@ -17,13 +17,10 @@ const AssetCard: React.FC<AssetCardProps> = ({ asset }) => {
   // Get price and price change directly from the store
   const prices = usePriceStore(state => state.prices);
   const priceChanges = usePriceStore(state => state.priceChanges);
-  const connectionStatus = usePriceStore(state => state.connectionStatus);
-
   const currentPrice = prices[asset.symbol] || 0;
   const priceChange = priceChanges[asset.symbol] || 0;
   const totalValue = currentPrice * asset.quantity;
   const isLoading = currentPrice === 0;
-  const isConnected = connectionStatus[asset.symbol] === 'connected';
 
   return (
     <div className="bg-gray-900/80 border border-gray-800 rounded-xl p-4 hover:bg-gray-800/80 transition-colors">
