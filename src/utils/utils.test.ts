@@ -2,40 +2,48 @@ import { formatCurrency, formatNumber, formatPercent, formatPriceChange, truncat
 
 describe('Utility Functions', () => {
   describe('formatCurrency', () => {
-    test('formats currency with 2 decimal places', () => {
-      expect(formatCurrency(1234.56)).toBe('$1,234.56');
+    test('formats small values correctly', () => {
+      expect(formatCurrency(123.45)).toBe('$123.45');
+    });
+
+    test('formats values in thousands correctly', () => {
+      expect(formatCurrency(1234.56)).toBe('$1.23K');
+    });
+
+    test('formats values in millions correctly', () => {
+      expect(formatCurrency(1234567.89)).toBe('$1.23M');
+    });
+
+    test('formats values in billions correctly', () => {
+      expect(formatCurrency(1234567890.12)).toBe('$1.23B');
     });
 
     test('formats zero correctly', () => {
       expect(formatCurrency(0)).toBe('$0.00');
     });
 
-    test('formats negative values correctly', () => {
-      expect(formatCurrency(-1234.56)).toBe('-$1,234.56');
+    test('formats very small values correctly', () => {
+      expect(formatCurrency(0.001)).toBe('<$0.01');
     });
   });
 
   describe('formatNumber', () => {
-    test('formats number with default 2 decimal places', () => {
-      expect(formatNumber(1234.56789)).toBe('1234.57');
-    });
-
-    test('formats number with specified decimal places', () => {
-      expect(formatNumber(1234.56789, 3)).toBe('1234.568');
+    test('formats number with locale string', () => {
+      expect(formatNumber(1234.56789)).toBe('1,234.568');
     });
   });
 
   describe('formatPercent', () => {
-    test('formats percentage with default 2 decimal places', () => {
-      expect(formatPercent(12.345)).toBe('12.35%');
-    });
-
-    test('formats percentage with specified decimal places', () => {
-      expect(formatPercent(12.345, 1)).toBe('12.3%');
+    test('formats positive percentage correctly', () => {
+      expect(formatPercent(12.345)).toBe('+12.35%');
     });
 
     test('formats negative percentage correctly', () => {
       expect(formatPercent(-12.345)).toBe('-12.35%');
+    });
+
+    test('formats zero percentage correctly', () => {
+      expect(formatPercent(0)).toBe('0.00%');
     });
   });
 

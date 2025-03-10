@@ -62,7 +62,7 @@ describe('Home Page', () => {
     );
 
     // 1.5 BTC * $50,000 + 10 ETH * $3,000 = $75,000 + $30,000 = $105,000
-    expect(screen.getByText(/Total Value: \$105,000.00/)).toBeInTheDocument();
+    expect(screen.getByText(/Total Value: \$105.00K/)).toBeInTheDocument();
   });
 
   test('renders add asset button', () => {

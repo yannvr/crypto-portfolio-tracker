@@ -24,7 +24,7 @@ Notes on external API:
 - **Search & Filter**: Find specific assets quickly with search and sorting options
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Local Storage**: Your portfolio data is saved between sessions
-- **Detailed Asset View**: Access to market stats and historical charts
+- **Market Stats**: Access to key market statistics for each asset
 
 ## Tech Stack
 

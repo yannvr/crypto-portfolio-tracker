@@ -101,7 +101,7 @@ describe('Details Page', () => {
     );
 
     expect(screen.getByText('Current Price')).toBeInTheDocument();
-    expect(screen.getByText('$50,000.00')).toBeInTheDocument();
+    expect(screen.getByText('$50.00K')).toBeInTheDocument();
   });
 
   test('renders price chart', () => {
@@ -132,7 +132,8 @@ describe('Details Page', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Loading market stats...')).toBeInTheDocument();
+    // Check for loading animation instead of specific text
+    expect(document.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   test('renders error state', () => {

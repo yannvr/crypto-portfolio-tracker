@@ -5,7 +5,7 @@ import PriceBadge from './PriceBadge';
 describe('PriceBadge Component', () => {
   test('renders price correctly', () => {
     render(<PriceBadge price={1234.56} />);
-    expect(screen.getByText('$1,234.56')).toBeInTheDocument();
+    expect(screen.getByText('$1.23K')).toBeInTheDocument();
   });
 
   test('renders positive price change in green', () => {

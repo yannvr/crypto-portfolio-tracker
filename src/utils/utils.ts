@@ -1,19 +1,62 @@
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-}
+/**
+ * Format a number as currency (USD)
+ * @param value - The number to format
+ * @returns Formatted currency string
+ */
+export const formatCurrency = (value: number): string => {
+  // Handle zero or very small values
+  if (value === 0) return '$0.00';
+  if (value < 0.01) return '<$0.01';
 
-export function formatNumber(value: number, precision = 2): string {
-  return value.toFixed(precision);
-}
+  // Format based on value size
+  if (value >= 1_000_000_000) {
+    return `$${(value / 1_000_000_000).toFixed(2)}B`;
+  } else if (value >= 1_000_000) {
+    return `$${(value / 1_000_000).toFixed(2)}M`;
+  } else if (value >= 1_000) {
+    return `$${(value / 1_000).toFixed(2)}K`;
+  } else {
+    return `$${value.toFixed(2)}`;
+  }
+};
 
-export function formatPercent(value: number, digits = 2): string {
-  return `${value.toFixed(digits)}%`;
-}
+/**
+ * Format a number as a percentage
+ * @param value - The number to format
+ * @returns Formatted percentage string
+ */
+export const formatPercent = (value: number): string => {
+  if (value === 0) return '0.00%';
+
+  const sign = value >= 0 ? '+' : '';
+  return `${sign}${value.toFixed(2)}%`;
+};
+
+/**
+ * Format a large number with commas
+ * @param value - The number to format
+ * @returns Formatted number string
+ */
+export const formatNumber = (value: number): string => {
+  return value.toLocaleString();
+};
+
+/**
+ * Format a date to a readable string
+ * @param date - The date to format
+ * @returns Formatted date string
+ */
+export const formatDate = (date: Date | string): string => {
+  if (!date) return 'N/A';
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  return dateObj.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
 
 export function formatPriceChange(change: number, price: number): string {
   const sign = change >= 0 ? '+' : '-';

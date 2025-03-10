@@ -1,25 +1,27 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import { useInitialPrices } from '../hooks/useAssetData';
 import usePortfolioStore from '../store/usePortfolioStore';
-import {
-  AssetInfoCard,
-  AssetNotFound,
-  MarketStatsCard,
-  PriceChartCard
-} from './Details.components';
+import { AssetInfoCard } from './Details/components/AssetInfoCard';
+import { AssetNotFound } from './Details/components/StateComponents';
+import { PriceChartCard } from './Details/components/PriceChartCard';
+import { MarketStatsCard } from './Details/components/MarketStatsCard';
 
 export default function Details() {
   const { id } = useParams();
   const selectAsset = usePortfolioStore(state => state.selectAsset);
   const [selectedDays, setSelectedDays] = useState(7);
 
-  // Get the asset directly without memoization
   const asset = selectAsset(id);
 
+  // Memoize the assets array to prevent unnecessary re-renders
+  const assetsForPrices = useMemo(() => {
+    return asset ? [asset] : [];
+  }, [asset?.id, asset?.symbol]);
+
   // Fetch initial price data if we have an asset
-  useInitialPrices(asset ? [asset] : []);
+  useInitialPrices(assetsForPrices);
 
   if (!asset) {
     return <AssetNotFound />;
@@ -44,20 +46,28 @@ export default function Details() {
         </Link>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <AssetInfoCard
-          asset={asset}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* First row with fixed height */}
+        <div className="lg:col-span-3 lg:flex lg:flex-col lg:h-[400px]">
+          <AssetInfoCard
+            asset={asset}
+          />
+        </div>
 
-        <PriceChartCard
-          asset={asset}
-          selectedDays={selectedDays}
-          setSelectedDays={handleDaysChange}
-        />
+        <div className="lg:col-span-9 lg:flex lg:flex-col lg:h-[400px]">
+          <PriceChartCard
+            asset={asset}
+            selectedDays={selectedDays}
+            setSelectedDays={handleDaysChange}
+          />
+        </div>
 
-        <MarketStatsCard
-          asset={asset}
-        />
+        {/* Second row - Market Stats only */}
+        <div className="lg:col-span-12">
+          <MarketStatsCard
+            symbol={asset.symbol}
+          />
+        </div>
       </div>
     </div>
   );

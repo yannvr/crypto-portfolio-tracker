@@ -47,7 +47,7 @@ describe('AssetCard Component', () => {
     );
 
     // 1.5 BTC * $50,000 = $75,000
-    expect(screen.getByText('$75,000.00')).toBeInTheDocument();
+    expect(screen.getByText('$75.00K')).toBeInTheDocument();
   });
 
   test('renders edit and details links', () => {
